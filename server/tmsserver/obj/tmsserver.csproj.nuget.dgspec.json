@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/Users/omindu/Documents/sliit/cspproject/CSP-Group-4/server/tmsserver/tmsserver.csproj": {}
+    "/Users/akinda/CSP-Group-4/server/tmsserver/tmsserver.csproj": {}
   },
   "projects": {
-    "/Users/omindu/Documents/sliit/cspproject/CSP-Group-4/server/tmsserver/tmsserver.csproj": {
+    "/Users/akinda/CSP-Group-4/server/tmsserver/tmsserver.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/omindu/Documents/sliit/cspproject/CSP-Group-4/server/tmsserver/tmsserver.csproj",
+        "projectUniqueName": "/Users/akinda/CSP-Group-4/server/tmsserver/tmsserver.csproj",
         "projectName": "tmsserver",
-        "projectPath": "/Users/omindu/Documents/sliit/cspproject/CSP-Group-4/server/tmsserver/tmsserver.csproj",
-        "packagesPath": "/Users/omindu/.nuget/packages/",
-        "outputPath": "/Users/omindu/Documents/sliit/cspproject/CSP-Group-4/server/tmsserver/obj/",
+        "projectPath": "/Users/akinda/CSP-Group-4/server/tmsserver/tmsserver.csproj",
+        "packagesPath": "/Users/akinda/.nuget/packages/",
+        "outputPath": "/Users/akinda/CSP-Group-4/server/tmsserver/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/omindu/.nuget/NuGet/NuGet.Config"
+          "/Users/akinda/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
