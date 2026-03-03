@@ -18,7 +18,6 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore & Build Backend
-        # Path updated to your new .sln location
         run: |
           dotnet restore server/tmsserver/CSP-Group-4.sln
           dotnet build server/tmsserver/CSP-Group-4.sln --configuration Release
