@@ -1,7 +1,7 @@
 import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import '../styles/LandingPage.css'; // Importing the new external stylesheet
+import '../styles/LandingPage.css';
 
 const LandingPage = () => {
   const practiceSchedule = [
@@ -21,7 +21,8 @@ const LandingPage = () => {
       </header>
 
       <main className="main-content">
-        {/* Practice Times Section */}
+        
+        {/* 1. Practice Times Section */}
         <section className="section-container">
           <h2 className="section-title">Weekly Practice Times</h2>
           <div className="grid">
@@ -35,33 +36,43 @@ const LandingPage = () => {
           </div>
         </section>
 
-        {/* Team Leadership Section */}
+        {/* 2. Team Captains Section */}
         <section className="section-container">
-          <h2 className="section-title">Team Leadership</h2>
-          <div className="grid">
-            {/* Men's Team Card */}
-            <div className="leadership-card">
-              <h3 className="card-title">Men's Team</h3>
+          <h2 className="section-title">Current Leadership</h2>
+          <div className="leadership-row">
+            <div>
+              <h3 className="team-heading">Men's Team</h3>
               <p><strong>Captain:</strong> Heshan Ranwala</p>
-              <p className="contact-text">📞 +94 77 123 4567</p>
-              <p className="contact-text">✉️ heshan.r@sliit.lk</p>
-              <br />
               <p><strong>Vice Captain:</strong> Thisura Lonath</p>
             </div>
-
-            {/* Women's Team Card */}
-            <div className="leadership-card">
-              <h3 className="card-title">Women's Team</h3>
+            <div>
+              <h3 className="team-heading">Women's Team</h3>
               <p><strong>Captain:</strong> Chalani Bandara</p>
-              <p className="contact-text">📞 +94 77 987 6543</p>
-              <p className="contact-text">✉️ chalani.b@sliit.lk</p>
-              <br />
               <p><strong>Vice Captain:</strong> Yalindi Dalpathadu</p>
             </div>
           </div>
         </section>
+
+        {/* 3. Contact Details Section */}
+        <section className="section-container contact-section">
+          <h2 className="section-title">Get in Touch</h2>
+          <div className="contact-details">
+            <p><strong>Men's Team Inquiries:</strong> 📞 +94 77 891 5969 | ✉️ heshan.r@sliit.lk</p>
+            <p><strong>Women's Team Inquiries:</strong> 📞 +94 74 195 5313 | ✉️ chalani.b@sliit.lk</p>
+          </div>
+        </section>
+
+        {/* 4. Past Captains Section */}
+        <section className="section-container">
+          <h2 className="section-title">Past Captains</h2>
+          <div className="legacy-list">
+            <p><strong>2025:</strong> Hasal Salwathura (Men) | Heshika Naranwala (Women)</p>
+            <p><strong>2024:</strong> Nithila Allalgoda (Men) | Ravindie Tilakaratne (Women)</p>
+          </div>
+        </section>
       </main>
-      <Footer /> {/* Add the footer here */}
+      
+      <Footer />
     </div>
   );
 };
