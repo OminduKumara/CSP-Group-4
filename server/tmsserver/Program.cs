@@ -15,23 +15,23 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+// Get connection string from environment variable for production
+var connectionString = builder.Environment.IsProduction()
+    ? Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? builder.Configuration.GetConnectionString("DefaultConnection")
+    : builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    var environment = builder.Environment;
-
-    if (environment.IsDevelopment())
-    {
-        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-    }
-    else
-    {
-        options.UseSqlServer(connectionString);
-    }
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
+// Get JWT key from environment variable for production
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
+var jwtKey = builder.Environment.IsProduction()
+    ? Environment.GetEnvironmentVariable("JWT_KEY") ?? jwtSettings["Key"]
+    : jwtSettings["Key"];
+
+var key = Encoding.UTF8.GetBytes(jwtKey!);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
@@ -41,8 +41,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
+        ValidIssuer = jwtSettings["Issuer"] ?? "TennisAPI",
+        ValidAudience = jwtSettings["Audience"] ?? "TennisUsers",
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
 });
@@ -71,12 +71,16 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 
-// Add CORS
+// Add CORS - use environment variable for production frontend URL
+var frontendUrl = builder.Environment.IsProduction()
+    ? Environment.GetEnvironmentVariable("FRONTEND_URL") ?? "http://localhost:5173"
+    : "http://localhost:5173";
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLocalhost", builder =>
     {
-        builder.WithOrigins("http://localhost:5173", "http://localhost:3000")
+        builder.WithOrigins(frontendUrl, "http://localhost:3000")
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
