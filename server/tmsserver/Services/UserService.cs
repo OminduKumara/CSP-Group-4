@@ -43,20 +43,25 @@ public class UserService
 
     public bool ValidateEmailDomain(string email)
     {
-        
-        return email.EndsWith("@sliit.lk") || email.EndsWith("@my.sliit.lk");
+        var normalizedEmail = email.Trim();
+        return normalizedEmail.EndsWith("@sliit.lk", StringComparison.OrdinalIgnoreCase)
+            || normalizedEmail.EndsWith("@my.sliit.lk", StringComparison.OrdinalIgnoreCase);
     }
 
     public bool ValidateIdentityNumber(string identityNumber)
     {
-        
-        bool hasLetters = identityNumber.Any(char.IsLetter);
-        bool hasNumbers = identityNumber.Any(char.IsDigit);
+        var normalizedIdentity = identityNumber.Trim();
+        bool hasLetters = normalizedIdentity.Any(char.IsLetter);
+        bool hasNumbers = normalizedIdentity.Any(char.IsDigit);
         return hasLetters && hasNumbers;
     }
 
     public async Task<User> RegisterUserAsync(string username, string identityNumber, string email, string password)
     {
+        username = username.Trim();
+        identityNumber = identityNumber.Trim();
+        email = email.Trim();
+
         
         if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(identityNumber) || 
             string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))

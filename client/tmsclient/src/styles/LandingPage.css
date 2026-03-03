@@ -1,0 +1,135 @@
+/* Core Page Layout */
+.landing-container {
+  font-family: Arial, sans-serif;
+  background-color: #FFFFFF;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+/* Watermark Overlay */
+.landing-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../assets/tennis-logo.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 80%; /* Adjusted for better visibility */
+  opacity: 0.05;
+  z-index: -1;
+}
+
+/* Hero Banner */
+.hero {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: #f4f6f9;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  color: #000080;
+  margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: #4a5568;
+}
+
+/* Sections Structure */
+.main-content {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.section-container {
+  margin-top: 2rem;
+  margin-bottom: 4rem;
+}
+
+.section-title {
+  text-align: center;
+  color: #000080;
+  margin-bottom: 2rem;
+}
+
+/* Practice Times Grid */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.practice-card, .leadership-card {
+  flex: 1;
+  min-width: 250px;
+  max-width: 300px;
+  background-color: #FFFFFF;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  border-top: 4px solid #FF5C00;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.practice-card:hover, .leadership-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+.card-title {
+  color: #000080;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+/* Contact and Team Styling */
+.leadership-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4rem;
+  text-align: center;
+}
+
+.team-heading {
+  color: #000080;
+  margin-bottom: 0.5rem;
+  border-bottom: 2px solid #FF5C00;
+  display: inline-block;
+  padding-bottom: 4px;
+}
+
+.contact-section {
+  background-color: #f4f6f9;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.contact-details p {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+/* Legacy Section */
+.legacy-list {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  line-height: 1.8;
+  color: #4a5568;
+}
+
+.legacy-list strong {
+  color: #000080;
+}

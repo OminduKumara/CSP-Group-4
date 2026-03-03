@@ -1,0 +1,12 @@
+.footer {
+  background-color: #000080; /* SLIIT Blue */
+  color: #FFFFFF;
+  text-align: center;
+  padding: 1.5rem 2rem;
+  margin-top: auto; /* Pushes footer to the bottom */
+}
+
+.footer-content p {
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+}

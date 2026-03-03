@@ -11,6 +11,7 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<RegistrationRequest> RegistrationRequests { get; set; }
+    public DbSet<RoleEntity> Roles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -85,6 +86,20 @@ public class ApplicationDbContext : DbContext
                 CreatedAt = seedDate,
                 ApprovedAt = seedDate
             }
+        );
+
+        // Seed default roles
+        modelBuilder.Entity<RoleEntity>(eb =>
+        {
+            eb.HasKey(r => r.Id);
+            eb.Property(r => r.Name).IsRequired();
+        });
+
+        modelBuilder.Entity<RoleEntity>().HasData(
+            new RoleEntity { Id = 1, Name = "SystemAdmin", Description = "System administrator with full access", PermissionsJson = "[\"*\"]", CreatedAt = seedDate },
+            new RoleEntity { Id = 2, Name = "Admin", Description = "Administrator with management access", PermissionsJson = "[\"manage_users\",\"manage_players\",\"approve_registrations\",\"view_reports\"]", CreatedAt = seedDate },
+            new RoleEntity { Id = 3, Name = "Player", Description = "Tournament player", PermissionsJson = "[\"view_tournaments\",\"register_tournament\",\"view_results\"]", CreatedAt = seedDate },
+            new RoleEntity { Id = 4, Name = "PendingPlayer", Description = "Player awaiting approval", PermissionsJson = "[]", CreatedAt = seedDate }
         );
     }
 
