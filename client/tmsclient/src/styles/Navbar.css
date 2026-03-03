@@ -1,0 +1,54 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #000080; /* SLIIT Blue */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Adds space between the logo and the text */
+}
+
+.logo-img {
+  height: 55px; 
+  width: auto;
+  background-color: #FFFFFF; /* Ensures the logo pops against the blue */
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  color: #FFFFFF;
+}
+
+.logo-title {
+  font-size: 0.85rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+.logo-subtitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 2px;
+}
+
+.login-btn {
+  background-color: #FF5C00; /* SLIIT Orange */
+  color: #FFFFFF;
+  padding: 0.6rem 1.4rem;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: opacity 0.2s ease;
+}
+
+.login-btn:hover {
+  opacity: 0.8;
+}

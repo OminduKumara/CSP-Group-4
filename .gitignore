@@ -1,0 +1,15 @@
+# .NET
+bin/
+obj/
+
+# Node
+node_modules/
+
+# VS Code
+.vscode/
+
+# Mac
+.DS_Store
+
+# Logs
+*.log
