@@ -18,16 +18,16 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore & Build Backend
-        # Points to the solution file inside the server folder
+        # Corrected: Using the .sln in the root
         run: |
-          dotnet restore server/*.sln
-          dotnet build server/*.sln --configuration Release
+          dotnet restore CSP-Group-4.sln
+          dotnet build CSP-Group-4.sln --configuration Release
 
       - name: Run Unit Tests
-        # Ensure this path matches where you initialized your NUnit project
-        run: dotnet test tests/UnitTests/*.csproj --configuration Release
+        # Corrected: Path to your UnitTests project based on your image
+        run: dotnet test tests/UnitTests/UnitTests.csproj --configuration Release
 
       - name: Build Backend Docker Image
-        # Tells Docker to look inside the 'server' folder for the Dockerfile
+        # Corrected: Build context is the server/tmsserver folder where your Dockerfile sits
         run: |
-          docker build -t my-backend:develop ./server
+          docker build -t tmsserver:develop ./server/tmsserver
