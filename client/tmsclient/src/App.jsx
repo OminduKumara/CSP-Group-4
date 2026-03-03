@@ -26,6 +26,9 @@ function AppRoutes() {
 
   return (
     <Routes>
+      {/* 1. Updated the base route to render the Landing Page */}
+      <Route path="/" element={<LandingPage />} />
+
       <Route
         path="/login"
         element={getDefaultRoute()}
@@ -54,8 +57,8 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      <Route path="/" element={<Navigate to="/login" />} />
-      <Route path="*" element={<Navigate to="/login" />} />
+      {/* 2. Updated fallback to catch bad URLs and send them home */}
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }
