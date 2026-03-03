@@ -1,20 +1,20 @@
-# Stage 1: Build
+# STAGE 1: Build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy the csproj file from the same folder as the Dockerfile
+# Copy the project file from the current directory (server/tmsserver)
 COPY tmsserver.csproj .
 RUN dotnet restore
 
-# Copy everything else in the tmsserver folder and publish
+# Copy everything else in the server/tmsserver folder
 COPY . .
 RUN dotnet publish tmsserver.csproj -c Release -o /app/publish
 
-# Stage 2: Runtime
+# STAGE 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/publish .
 
 EXPOSE 80
-# Corrected: Based on your file name 'tmsserver.csproj'
+# Matches the name of your compiled output
 ENTRYPOINT ["dotnet", "tmsserver.dll"]
