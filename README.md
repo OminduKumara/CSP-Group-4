@@ -1,39 +1,101 @@
-# CSP-Group-4
-SLIIT Tennis Web Application
+# SLIIT Tennis Management System
 
-## Deployment Instructions
+**Group:** Group 04\
+**Module:** SE3022 Case Study Project (Year 3 Semester 1)\
+**Members:**\
+   IT23750210 - K.H.G.A.Udaneth\
+   IT23575776 - M.S.A.O.Kumara\
+   IT23645684 - V.N.Jayasinghe\
+   IT23575608 - H.W.Ranwala
 
-This project uses **Entity Framework Core** with migrations and ADO.NET to manage the MySQL database. To ensure the database is created automatically upon startup (including when deploying to Azure), the `Program.cs` calls `Database.Migrate()` which applies any pending migrations.
+---
 
-### Local Setup
+## Tech Stack
 
-1. Install MySQL server and the `mysql` client on your machine.
-2. Update the connection string in `server/tmsserver/appsettings.json` (or use environment variables) with your local MySQL credentials.
-3. From the server project directory run:
+This project strictly adheres to the SE3022 Technical Implementation requirements
+
+**Frontend:** React.js\
+**Backend:** ASP.NET Core Web API\
+**Database Access:** ADO.NET (Direct SQL, No ORMs)\
+**Database:** MySQL\
+**CI/CD & Version Control:** GitHub Actions, Git\
+**Deployment:** Docker / Azure App Service\
+**Testing:** Selenium (E2E), JMeter (Load), NUnit/xUnit (Unit)
+
+---
+
+## Core Modules & Features
+
+The system is divided into four primary domains, featuring Role-Based Access Control (RBAC) for Admins (Captains/Vice-Captains), Players, and Visitors:
+
+1.  **Player & Attendance Management:** Track weekly practice sessions, log player attendance, and generate fitness reports.
+2.  **Tournament & Live Scoring:** Create tournament brackets, update live match scores, and generate automated leaderboards.
+3.  **Equipment & Inventory Control:** Manage communal club gear, track equipment condition, and calculate financial loss for damaged items.
+4.  **System Administration & QA Dashboard:** Manage user accounts, assign roles, and view live CI/CD and code coverage metrics.
+
+---
+
+## Prerequisites
+
+Ensure you have the following installed on your local machine before setting up the project:
+
+* [Node.js](https://nodejs.org/) (v18+ recommended)
+* [.NET 8.0 SDK](https://dotnet.microsoft.com/download)
+* [MySQL Server](https://dev.mysql.com/downloads/mysql/) (v8.0+)
+* Git
+
+---
+
+## Local Setup Instructions
+
+### 1. Database Configuration
+1. Open MySQL Workbench or your preferred database client.
+2. Execute the database creation script located at `/database/schema.sql` to generate the tables.
+3. (Optional) Execute `/database/seed_data.sql` to populate the database with mock users and equipment for testing.
+
+### 2. Backend Setup (ASP.NET)
+1. Navigate to the backend directory:
    ```bash
-   dotnet ef database update
-   dotnet run
-   ```
-   The initial migration will create the schema and seed admin accounts and roles.
+   cd backend
+2. Restore the .NET dependencies:
+   `dotnet restore`
+3. Update the database connection string. Open appsettings.json (or appsettings.Development.json) and configure your MySQL credentials:
+   `"ConnectionStrings": {
+  "DefaultConnection": "Server=localhost;Database=SliitTennisDB;User=root;Password=YOUR_PASSWORD;"
+}`
+4. Run the API:
+   `dotnet run` 
+The Swagger API documentation will be available at http://localhost:<port>/swagger.
 
-### Azure Deployment
+### 3. Frontend Setup (React.js)
+1. Open a new terminal and navigate to the frontend directory:
+   `cd frontend`
+2. Install the Node modules:
+   `npm install`
+3. Create a .env file in the root of the /frontend directory and define the backend API URL:
+   `REACT_APP_API_URL=http://localhost:<backend-port>/api`
+4. Start the React development server:
+   `npm start`
 
-1. Create an **Azure Database for MySQL** instance (Flexible Server or Single Server).
-2. Configure firewall rules and obtain the connection string (e.g. `Server=<your-server>.mysql.database.azure.com;Database=tennis_management;User=<user>@<your-server>;Password=<pwd>;`).
-3. In the Azure App Service configuration or `appsettings.json`, set `ConnectionStrings:DefaultConnection` to this value.
-4. Deploy the app using GitHub Actions, Azure DevOps, or `az webapp deploy`.
-5. On first startup, EF Core migrations will run and create the database objects automatically.
+---
 
-> **Note:** The project already includes a migration (`Migrations/20260301094845_InitialCreate.*`) which defines the `Users`, `Roles`, and `RegistrationRequests` tables.
+## Testing
 
-## Roles and Access Control
+**Unit Tests (Backend):** Navigate to the /tests/Backend.Tests directory and run: dotnet test
 
-The application implements role-based access control with the following roles:
-- `SystemAdmin` (full access)
-- `Admin` (manage players and registrations)
-- `Player` (standard user)
-- `PendingPlayer` (awaiting approval)
+**End-to-End Tests (Selenium):** Ensure the application is running locally. Navigate to /tests/E2E and execute the test suite to verify UI workflows.
 
-Seeded admin accounts (password `admin123`) exist for initial access.
+**Load Testing (JMeter):** Open the /tests/LoadTesting/Attendance_Spike.jmx file in the Apache JMeter GUI to simulate concurrent user traffic.
 
+---
 
+## Git Branching Strategy
+
+To maintain a clean and stable repository, all team members must follow this strict branching workflow:
+
+* main: Production-ready code only. Do not commit directly to this branch.
+* develop: The primary integration branch.
+* feature/<feature-name>: Create these branches off develop for new user stories (e.g., feature/tournament-bracket).
+* testing/<: For fixing issues found during QA.
+
+Pull Request Process: All code merged into develop or main requires a Pull Request (PR). GitHub Actions will automatically run the build and unit test steps. The PR must pass all checks and be reviewed by at least one other team member before merging.
