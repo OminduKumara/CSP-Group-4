@@ -2,9 +2,9 @@ name: Monorepo CI/CD
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "develop", "test" ]
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "develop", "test" ]
 
 jobs:
   backend-ci:
