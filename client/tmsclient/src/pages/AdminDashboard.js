@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+
+import { API_ENDPOINTS } from '../config/api';
 import '../styles/AdminDashboard.css';
 
-const API_URL = 'http://localhost:5011/api/admin';
+const API_URL = API_ENDPOINTS.ADMIN;
+
 
 function isAdminRole(role) {
   const normalizedRole = String(role || '').trim().toLowerCase();

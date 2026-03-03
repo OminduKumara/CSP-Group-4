@@ -1744,19 +1744,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\hesha\\.nuget\\packages\\": {}
+    "/Users/omindu/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\hesha\\Desktop\\CSP\\Main Project\\CSP-Group-4\\tests\\UITests\\UITests.csproj",
+      "projectUniqueName": "/Users/omindu/Documents/sliit/cspproject/CSP-Group-4/tests/UITests/UITests.csproj",
       "projectName": "UITests",
-      "projectPath": "C:\\Users\\hesha\\Desktop\\CSP\\Main Project\\CSP-Group-4\\tests\\UITests\\UITests.csproj",
-      "packagesPath": "C:\\Users\\hesha\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\hesha\\Desktop\\CSP\\Main Project\\CSP-Group-4\\tests\\UITests\\obj\\",
+      "projectPath": "/Users/omindu/Documents/sliit/cspproject/CSP-Group-4/tests/UITests/UITests.csproj",
+      "packagesPath": "/Users/omindu/.nuget/packages/",
+      "outputPath": "/Users/omindu/Documents/sliit/cspproject/CSP-Group-4/tests/UITests/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\hesha\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "/Users/omindu/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -1780,7 +1780,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "11.0.100"
+      "SdkAnalysisLevel": "10.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -1829,15 +1829,11 @@
         "downloadDependencies": [
           {
             "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[8.0.23, 8.0.23]"
+            "version": "[8.0.24, 8.0.24]"
           },
           {
             "name": "Microsoft.NETCore.App.Ref",
-            "version": "[8.0.23, 8.0.23]"
-          },
-          {
-            "name": "Microsoft.WindowsDesktop.App.Ref",
-            "version": "[8.0.23, 8.0.23]"
+            "version": "[8.0.24, 8.0.24]"
           }
         ],
         "frameworkReferences": {
@@ -1845,7 +1841,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\11.0.100-preview.1.26104.118/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
