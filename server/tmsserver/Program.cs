@@ -86,7 +86,16 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Add health check endpoint for debugging
-app.MapGet("/health", () => Results.Ok(new { status = "healthy", environment = app.Environment.EnvironmentName }));
+app.MapGet("/", () => Results.Ok(new { 
+    status = "running", 
+    environment = app.Environment.EnvironmentName,
+    timestamp = DateTime.UtcNow 
+}));
+
+app.MapGet("/health", () => Results.Ok(new { 
+    status = "healthy", 
+    environment = app.Environment.EnvironmentName 
+}));
 
 // Apply EF Core migrations at startup
 using (var scope = app.Services.CreateScope())
@@ -153,12 +162,6 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
-else
-{
-    // In production, map OpenAPI for debugging
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
 
 app.UseCors("AllowFrontend");
 
@@ -166,5 +169,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapGet("/api", () => Results.Ok(new { 
+    message = "TMS API is running", 
+    version = "1.0",
+    endpoints = new [] { "/api/auth/login", "/api/auth/signup", "/api/admin", "/api/test", "/health" }
+}));
 
 app.Run();
