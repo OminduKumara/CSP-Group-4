@@ -85,7 +85,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Apply EF Core migrations at startup (ensures schema is created/updated)
+// Apply EF Core migrations at startup
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
