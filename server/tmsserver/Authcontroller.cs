@@ -10,6 +10,8 @@ using tmsserver.Models;
 using tmsserver.Services;
 using AuthSvc = tmsserver.Services.IAuthorizationService;
 
+namespace tmsserver.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
 public class AuthController : ControllerBase
