@@ -85,6 +85,9 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Add health check endpoint for debugging
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", environment = app.Environment.EnvironmentName }));
+
 // Apply EF Core migrations at startup
 using (var scope = app.Services.CreateScope())
 {
@@ -147,6 +150,12 @@ using (var scope = app.Services.CreateScope())
 
 if (app.Environment.IsDevelopment())
 {
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
+else
+{
+    // In production, map OpenAPI for debugging
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
