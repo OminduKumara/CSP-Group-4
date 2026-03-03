@@ -11,9 +11,13 @@ using tmsserver.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
- 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
+
+// Get connection string from environment variable for production
+var connectionString = builder.Environment.IsProduction()
+    ? Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? builder.Configuration.GetConnectionString("DefaultConnection")
+    : builder.Configuration.GetConnectionString("DefaultConnection");
 
 // Get connection string from environment variable for production
 var connectionString = builder.Environment.IsProduction()
@@ -23,10 +27,18 @@ var connectionString = builder.Environment.IsProduction()
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+{
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
 // Get JWT key from environment variable for production
+// Get JWT key from environment variable for production
 var jwtSettings = builder.Configuration.GetSection("Jwt");
+var jwtKey = builder.Environment.IsProduction()
+    ? Environment.GetEnvironmentVariable("JWT_KEY") ?? jwtSettings["Key"]
+    : jwtSettings["Key"];
+
+var key = Encoding.UTF8.GetBytes(jwtKey!);
 var jwtKey = builder.Environment.IsProduction()
     ? Environment.GetEnvironmentVariable("JWT_KEY") ?? jwtSettings["Key"]
     : jwtSettings["Key"];
@@ -41,6 +53,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"] ?? "TennisAPI",
+        ValidAudience = jwtSettings["Audience"] ?? "TennisUsers",
         ValidIssuer = jwtSettings["Issuer"] ?? "TennisAPI",
         ValidAudience = jwtSettings["Audience"] ?? "TennisUsers",
         IssuerSigningKey = new SymmetricSecurityKey(key)
@@ -78,7 +92,7 @@ var frontendUrl = builder.Environment.IsProduction()
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowLocalhost", builder =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
         builder.WithOrigins(frontendUrl, "http://localhost:3000")
                .AllowAnyMethod()
@@ -154,7 +168,7 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-app.UseCors("AllowLocalhost");
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
