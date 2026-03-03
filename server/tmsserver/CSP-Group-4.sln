@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tmsserver", "tmsserver.csproj", "{324502AA-84DF-5195-0925-FAE4CE980C69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "..\..\tests\UnitTests\UnitTests.csproj", "{B1C2A3D4-E5F6-47A8-9B0C-1D2E3F4G5H6I}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{324502AA-84DF-5195-0925-FAE4CE980C69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{324502AA-84DF-5195-0925-FAE4CE980C69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{324502AA-84DF-5195-0925-FAE4CE980C69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{324502AA-84DF-5195-0925-FAE4CE980C69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1C2A3D4-E5F6-47A8-9B0C-1D2E3F4G5H6I}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1C2A3D4-E5F6-47A8-9B0C-1D2E3F4G5H6I}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1C2A3D4-E5F6-47A8-9B0C-1D2E3F4G5H6I}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1C2A3D4-E5F6-47A8-9B0C-1D2E3F4G5H6I}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

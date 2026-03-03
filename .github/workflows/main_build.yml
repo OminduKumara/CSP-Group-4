@@ -1,0 +1,36 @@
+name: Monorepo CI/CD
+
+on:
+  push:
+    branches: [ "develop", "test" ]
+  pull_request:
+    branches: [ "develop", "test" ]
+
+jobs:
+  backend-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x' # Forces the runner to use stable .NET 8
+
+      - name: Restore & Build Backend
+        # Points to your solution inside the server/tmsserver folder
+        run: |
+          dotnet restore server/tmsserver/CSP-Group-4.sln
+          dotnet build server/tmsserver/CSP-Group-4.sln --configuration Release
+
+      - name: Run Unit Tests
+        # Added a logger to create a .xml result file
+        run: dotnet test tests/UnitTests/UnitTests.csproj --configuration Release --logger "junit;LogFileName=test-results.xml"
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          # Using the wildcard helps find the file even if the path shifts slightly
+          path: tests/UnitTests/TestResults/*.xml
