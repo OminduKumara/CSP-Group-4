@@ -17,8 +17,18 @@ builder.Services.AddOpenApi();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
-);
+{
+    var environment = builder.Environment;
+
+    if (environment.IsDevelopment())
+    {
+        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+    }
+    else
+    {
+        options.UseSqlServer(connectionString);
+    }
+});
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);

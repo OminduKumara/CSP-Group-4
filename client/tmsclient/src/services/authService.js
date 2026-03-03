@@ -1,4 +1,6 @@
-const API_URL = 'http://localhost:5011/api/auth';
+import { API_ENDPOINTS } from '../config/api';
+
+const API_URL = API_ENDPOINTS.AUTH;
 
 export const authService = {
   login: async (identifier, password) => {

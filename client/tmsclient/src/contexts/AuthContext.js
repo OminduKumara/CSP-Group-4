@@ -1,10 +1,11 @@
 import React from 'react';
+import { API_ENDPOINTS } from '../config/api';
 
 const { createContext, useContext, useState, useCallback, useEffect } = React;
 
 const AuthContext = createContext();
 
-const API_URL = 'http://localhost:5011/api/auth';
+const API_URL = API_ENDPOINTS.AUTH;
 
 export function AuthProvider(props) {
   const { children } = props;
