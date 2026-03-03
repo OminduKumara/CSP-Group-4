@@ -13,10 +13,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("tmsserver")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-
-
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0c8dc96a6ba32715eda9bc94760eb139fc2eeb6b")]
-
+<<<<<<< Updated upstream
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+79a9c7b92688bdc771dac75a07e2d79f3dba86de")]
+=======
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6b2ad036aa8aef61256ef6093c401965bcb2ba80")]
+>>>>>>> Stashed changes
 [assembly: System.Reflection.AssemblyProductAttribute("tmsserver")]
 [assembly: System.Reflection.AssemblyTitleAttribute("tmsserver")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

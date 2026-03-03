@@ -19,26 +19,13 @@ var connectionString = builder.Environment.IsProduction()
     ? Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? builder.Configuration.GetConnectionString("DefaultConnection")
     : builder.Configuration.GetConnectionString("DefaultConnection");
 
-// Get connection string from environment variable for production
-var connectionString = builder.Environment.IsProduction()
-    ? Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? builder.Configuration.GetConnectionString("DefaultConnection")
-    : builder.Configuration.GetConnectionString("DefaultConnection");
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 {
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
 // Get JWT key from environment variable for production
-// Get JWT key from environment variable for production
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var jwtKey = builder.Environment.IsProduction()
-    ? Environment.GetEnvironmentVariable("JWT_KEY") ?? jwtSettings["Key"]
-    : jwtSettings["Key"];
-
-var key = Encoding.UTF8.GetBytes(jwtKey!);
 var jwtKey = builder.Environment.IsProduction()
     ? Environment.GetEnvironmentVariable("JWT_KEY") ?? jwtSettings["Key"]
     : jwtSettings["Key"];
@@ -55,23 +42,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwtSettings["Issuer"] ?? "TennisAPI",
         ValidAudience = jwtSettings["Audience"] ?? "TennisUsers",
-        ValidIssuer = jwtSettings["Issuer"] ?? "TennisAPI",
-        ValidAudience = jwtSettings["Audience"] ?? "TennisUsers",
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
 });
 
 builder.Services.AddAuthorization(options =>
 {
-    // Policy: Only Admins can manage users
     options.AddPolicy("AdminOnly", policy =>
         policy.RequireRole("SystemAdmin", "Admin"));
 
-    // Policy: Admin or System Admin can approve registrations
     options.AddPolicy("ApproveRegistrations", policy =>
         policy.RequireRole("SystemAdmin", "Admin"));
 
-    // Policy: Only approved players
     options.AddPolicy("ApprovedPlayersOnly", policy =>
         policy.RequireRole("SystemAdmin", "Admin", "Player"));
 });
@@ -85,7 +67,7 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 
-// Add CORS - use environment variable for production frontend URL
+// Add CORS with dynamic frontend URL
 var frontendUrl = builder.Environment.IsProduction()
     ? Environment.GetEnvironmentVariable("FRONTEND_URL") ?? "http://localhost:5173"
     : "http://localhost:5173";
@@ -94,15 +76,16 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        builder.WithOrigins(frontendUrl, "http://localhost:3000")
-               .AllowAnyMethod()
-               .AllowAnyHeader();
+        policy.WithOrigins(frontendUrl, "http://localhost:5173", "http://localhost:3000")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
 var app = builder.Build();
 
-// Apply EF Core migrations at startup (ensures schema is created/updated)
+// Apply EF Core migrations at startup
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
