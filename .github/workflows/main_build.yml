@@ -15,17 +15,14 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '8.0.x' # Forces the runner to use stable .NET 8
 
       - name: Restore & Build Backend
+        # Points to your solution inside the server/tmsserver folder
         run: |
           dotnet restore server/tmsserver/CSP-Group-4.sln
           dotnet build server/tmsserver/CSP-Group-4.sln --configuration Release
 
       - name: Run Unit Tests
-        # The test runner still looks at the root level 'tests' folder
+        # Runs the specific NUnit project you initialized
         run: dotnet test tests/UnitTests/UnitTests.csproj --configuration Release
-
-      - name: Build Backend Docker Image
-        run: |
-          docker build -t tmsserver:develop ./server/tmsserver
