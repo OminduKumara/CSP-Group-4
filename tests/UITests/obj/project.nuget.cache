@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "eBAXmQ4wAZk=",
+  "dgSpecHash": "TSe/zt/wMGs=",
   "success": true,
   "projectFilePath": "C:\\Users\\hesha\\Desktop\\CSP\\Main Project\\CSP-Group-4\\tests\\UITests\\UITests.csproj",
   "expectedPackageFiles": [
@@ -20,7 +20,13 @@
     "C:\\Users\\hesha\\.nuget\\packages\\nunit.analyzers\\4.7.0\\nunit.analyzers.4.7.0.nupkg.sha512",
     "C:\\Users\\hesha\\.nuget\\packages\\nunit3testadapter\\5.0.0\\nunit3testadapter.5.0.0.nupkg.sha512",
     "C:\\Users\\hesha\\.nuget\\packages\\selenium.webdriver\\4.41.0\\selenium.webdriver.4.41.0.nupkg.sha512",
-    "C:\\Users\\hesha\\.nuget\\packages\\selenium.webdriver.chromedriver\\145.0.7632.11700\\selenium.webdriver.chromedriver.145.0.7632.11700.nupkg.sha512"
+    "C:\\Users\\hesha\\.nuget\\packages\\selenium.webdriver.chromedriver\\145.0.7632.11700\\selenium.webdriver.chromedriver.145.0.7632.11700.nupkg.sha512",
+    "C:\\Users\\hesha\\.nuget\\packages\\system.collections.immutable\\8.0.0\\system.collections.immutable.8.0.0.nupkg.sha512",
+    "C:\\Users\\hesha\\.nuget\\packages\\system.diagnostics.diagnosticsource\\5.0.0\\system.diagnostics.diagnosticsource.5.0.0.nupkg.sha512",
+    "C:\\Users\\hesha\\.nuget\\packages\\system.reflection.metadata\\8.0.0\\system.reflection.metadata.8.0.0.nupkg.sha512",
+    "C:\\Users\\hesha\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.23\\microsoft.aspnetcore.app.ref.8.0.23.nupkg.sha512",
+    "C:\\Users\\hesha\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.23\\microsoft.netcore.app.ref.8.0.23.nupkg.sha512",
+    "C:\\Users\\hesha\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.23\\microsoft.windowsdesktop.app.ref.8.0.23.nupkg.sha512"
   ],
   "logs": []
 }

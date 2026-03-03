@@ -35,3 +35,6 @@ jobs:
           # .NET usually places the HTML file in a timestamped folder inside TestResults
           # Using ** helps the runner find it regardless of the folder name
           path: tests/UnitTests/TestResults/**/*.html
+
+      - name: Run UI Tests
+        run: dotnet test tests/UITests/UITests.csproj --configuration Release
