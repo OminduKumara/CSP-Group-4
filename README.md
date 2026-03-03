@@ -1,7 +1,12 @@
 # SLIIT Tennis Management System
 
-**Group:** Group 04
-**Module:** SE3022 Case Study Project (Year 3 Semester 1)
+**Group:** Group 04\
+**Module:** SE3022 Case Study Project (Year 3 Semester 1)\
+**Members:**\
+   IT23750210 - K.H.G.A.Udaneth\
+   IT23575776 - M.S.A.O.Kumara\
+   IT23645684 - V.N.Jayasinghe\
+   IT23575608 - H.W.Ranwala
 
 ---
 
@@ -9,12 +14,12 @@
 
 This project strictly adheres to the SE3022 Technical Implementation requirements
 
-**Frontend:** React.js
-**Backend:** ASP.NET Core Web API
-**Database Access:** ADO.NET (Direct SQL, No ORMs)
-**Database:** MySQL
-**CI/CD & Version Control:** GitHub Actions, Git
-**Deployment:** Docker / Azure App Service
+**Frontend:** React.js\
+**Backend:** ASP.NET Core Web API\
+**Database Access:** ADO.NET (Direct SQL, No ORMs)\
+**Database:** MySQL\
+**CI/CD & Version Control:** GitHub Actions, Git\
+**Deployment:** Docker / Azure App Service\
 **Testing:** Selenium (E2E), JMeter (Load), NUnit/xUnit (Unit)
 
 ---
