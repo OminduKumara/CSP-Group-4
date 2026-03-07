@@ -12,8 +12,8 @@ using tmsserver.Data;
 namespace tmsserver.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260301094845_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260305091926_InitialCreateSqlServer")]
+    partial class InitialCreateSqlServer
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,9 +21,9 @@ namespace tmsserver.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.0")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("tmsserver.Models.RegistrationRequest", b =>
                 {
@@ -31,23 +31,23 @@ namespace tmsserver.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("RejectionReason")
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ReviewedAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime2");
 
                     b.Property<int?>("ReviewedByAdminId")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -67,23 +67,23 @@ namespace tmsserver.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PermissionsJson")
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -97,7 +97,7 @@ namespace tmsserver.Migrations
                             Description = "System administrator with full access",
                             Name = "SystemAdmin",
                             PermissionsJson = "[\"*\"]",
-                            UpdatedAt = new DateTime(2026, 3, 1, 9, 48, 44, 695, DateTimeKind.Utc).AddTicks(9157)
+                            UpdatedAt = new DateTime(2026, 3, 5, 9, 19, 26, 468, DateTimeKind.Utc).AddTicks(330)
                         },
                         new
                         {
@@ -106,7 +106,7 @@ namespace tmsserver.Migrations
                             Description = "Administrator with management access",
                             Name = "Admin",
                             PermissionsJson = "[\"manage_users\",\"manage_players\",\"approve_registrations\",\"view_reports\"]",
-                            UpdatedAt = new DateTime(2026, 3, 1, 9, 48, 44, 696, DateTimeKind.Utc).AddTicks(311)
+                            UpdatedAt = new DateTime(2026, 3, 5, 9, 19, 26, 468, DateTimeKind.Utc).AddTicks(1150)
                         },
                         new
                         {
@@ -115,7 +115,7 @@ namespace tmsserver.Migrations
                             Description = "Tournament player",
                             Name = "Player",
                             PermissionsJson = "[\"view_tournaments\",\"register_tournament\",\"view_results\"]",
-                            UpdatedAt = new DateTime(2026, 3, 1, 9, 48, 44, 696, DateTimeKind.Utc).AddTicks(314)
+                            UpdatedAt = new DateTime(2026, 3, 5, 9, 19, 26, 468, DateTimeKind.Utc).AddTicks(1150)
                         },
                         new
                         {
@@ -124,7 +124,7 @@ namespace tmsserver.Migrations
                             Description = "Player awaiting approval",
                             Name = "PendingPlayer",
                             PermissionsJson = "[]",
-                            UpdatedAt = new DateTime(2026, 3, 1, 9, 48, 44, 696, DateTimeKind.Utc).AddTicks(316)
+                            UpdatedAt = new DateTime(2026, 3, 5, 9, 19, 26, 468, DateTimeKind.Utc).AddTicks(1150)
                         });
                 });
 
@@ -134,38 +134,38 @@ namespace tmsserver.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("ApprovedAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime2");
 
                     b.Property<int?>("ApprovedByAdminId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("IdentityNumber")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsApproved")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("bit");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 

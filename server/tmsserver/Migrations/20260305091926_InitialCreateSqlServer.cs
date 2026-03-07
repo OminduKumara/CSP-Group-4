@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -9,75 +8,61 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace tmsserver.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCreateSqlServer : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterDatabase()
-                .Annotation("MySql:CharSet", "utf8mb4");
-
             migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Description = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    PermissionsJson = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PermissionsJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Roles", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+                });
 
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Username = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    IdentityNumber = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Email = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    PasswordHash = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Username = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    IdentityNumber = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Role = table.Column<int>(type: "int", nullable: false),
-                    IsApproved = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: false),
                     ApprovedByAdminId = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    ApprovedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ApprovedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+                });
 
             migrationBuilder.CreateTable(
                 name: "RegistrationRequests",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ReviewedByAdminId = table.Column<int>(type: "int", nullable: true),
-                    RejectionReason = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    ReviewedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                    RejectionReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ReviewedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -93,19 +78,18 @@ namespace tmsserver.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+                        onDelete: ReferentialAction.NoAction);
+                });
 
             migrationBuilder.InsertData(
                 table: "Roles",
                 columns: new[] { "Id", "CreatedAt", "Description", "Name", "PermissionsJson", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2026, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System administrator with full access", "SystemAdmin", "[\"*\"]", new DateTime(2026, 3, 1, 9, 48, 44, 695, DateTimeKind.Utc).AddTicks(9157) },
-                    { 2, new DateTime(2026, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Administrator with management access", "Admin", "[\"manage_users\",\"manage_players\",\"approve_registrations\",\"view_reports\"]", new DateTime(2026, 3, 1, 9, 48, 44, 696, DateTimeKind.Utc).AddTicks(311) },
-                    { 3, new DateTime(2026, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Tournament player", "Player", "[\"view_tournaments\",\"register_tournament\",\"view_results\"]", new DateTime(2026, 3, 1, 9, 48, 44, 696, DateTimeKind.Utc).AddTicks(314) },
-                    { 4, new DateTime(2026, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Player awaiting approval", "PendingPlayer", "[]", new DateTime(2026, 3, 1, 9, 48, 44, 696, DateTimeKind.Utc).AddTicks(316) }
+                    { 1, new DateTime(2026, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System administrator with full access", "SystemAdmin", "[\"*\"]", new DateTime(2026, 3, 5, 9, 19, 26, 468, DateTimeKind.Utc).AddTicks(330) },
+                    { 2, new DateTime(2026, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Administrator with management access", "Admin", "[\"manage_users\",\"manage_players\",\"approve_registrations\",\"view_reports\"]", new DateTime(2026, 3, 5, 9, 19, 26, 468, DateTimeKind.Utc).AddTicks(1150) },
+                    { 3, new DateTime(2026, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Tournament player", "Player", "[\"view_tournaments\",\"register_tournament\",\"view_results\"]", new DateTime(2026, 3, 5, 9, 19, 26, 468, DateTimeKind.Utc).AddTicks(1150) },
+                    { 4, new DateTime(2026, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Player awaiting approval", "PendingPlayer", "[]", new DateTime(2026, 3, 5, 9, 19, 26, 468, DateTimeKind.Utc).AddTicks(1150) }
                 });
 
             migrationBuilder.InsertData(

@@ -1,4 +1,4 @@
-using MySqlConnector;
+using Microsoft.Data.SqlClient;
 using tmsserver.Models;
 
 namespace tmsserver.Data.Repositories;
@@ -21,14 +21,15 @@ public class RegistrationRequestRepository : IRegistrationRequestRepository
 
     public RegistrationRequestRepository(IConfiguration configuration)
     {
-        _connectionString = configuration.GetConnectionString("DefaultConnection") 
-            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        _connectionString = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING")
+            ?? configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Environment variable 'AZURE_SQL_CONNECTIONSTRING' is not configured.");
     }
 
     public async Task<List<RegistrationRequest>> GetAllPendingRequestsAsync()
     {
         var requests = new List<RegistrationRequest>();
-        using (var connection = new MySqlConnection(_connectionString))
+        using (var connection = new SqlConnection(_connectionString))
         {
             await connection.OpenAsync();
             var command = connection.CreateCommand();
@@ -51,7 +52,7 @@ public class RegistrationRequestRepository : IRegistrationRequestRepository
 
     public async Task<RegistrationRequest?> GetRequestByIdAsync(int id)
     {
-        using (var connection = new MySqlConnection(_connectionString))
+        using (var connection = new SqlConnection(_connectionString))
         {
             await connection.OpenAsync();
             var command = connection.CreateCommand();
@@ -74,7 +75,7 @@ public class RegistrationRequestRepository : IRegistrationRequestRepository
 
     public async Task<RegistrationRequest?> GetRequestByUserIdAsync(int userId)
     {
-        using (var connection = new MySqlConnection(_connectionString))
+        using (var connection = new SqlConnection(_connectionString))
         {
             await connection.OpenAsync();
             var command = connection.CreateCommand();
@@ -98,7 +99,7 @@ public class RegistrationRequestRepository : IRegistrationRequestRepository
     public async Task<List<RegistrationRequest>> GetRequestsByStatusAsync(string status)
     {
         var requests = new List<RegistrationRequest>();
-        using (var connection = new MySqlConnection(_connectionString))
+        using (var connection = new SqlConnection(_connectionString))
         {
             await connection.OpenAsync();
             var command = connection.CreateCommand();
@@ -122,7 +123,7 @@ public class RegistrationRequestRepository : IRegistrationRequestRepository
 
     public async Task<RegistrationRequest> CreateRequestAsync(RegistrationRequest request)
     {
-        using (var connection = new MySqlConnection(_connectionString))
+        using (var connection = new SqlConnection(_connectionString))
         {
             await connection.OpenAsync();
             var command = connection.CreateCommand();
@@ -146,7 +147,7 @@ public class RegistrationRequestRepository : IRegistrationRequestRepository
 
     public async Task<bool> UpdateRequestStatusAsync(int requestId, string status, int? reviewedByAdminId = null, string? rejectionReason = null)
     {
-        using (var connection = new MySqlConnection(_connectionString))
+        using (var connection = new SqlConnection(_connectionString))
         {
             await connection.OpenAsync();
             var command = connection.CreateCommand();
@@ -176,7 +177,7 @@ public class RegistrationRequestRepository : IRegistrationRequestRepository
         return await UpdateRequestStatusAsync(requestId, "Rejected", rejectedByAdminId, reason);
     }
 
-    private RegistrationRequest BuildRegistrationRequestFromReader(MySqlDataReader reader)
+    private RegistrationRequest BuildRegistrationRequestFromReader(SqlDataReader reader)
     {
         return new RegistrationRequest
         {

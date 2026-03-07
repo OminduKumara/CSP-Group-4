@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Data;
@@ -10,27 +9,22 @@ using tmsserver.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure services
 builder.Services.AddControllers();
+ 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
-// Get connection string from environment variable for production
-var connectionString = builder.Environment.IsProduction()
-    ? Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? builder.Configuration.GetConnectionString("DefaultConnection")
-    : builder.Configuration.GetConnectionString("DefaultConnection");
+// Use AZURE_SQL_CONNECTIONSTRING environment variable
+var connectionString = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+if (string.IsNullOrEmpty(connectionString))
 {
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-});
+    throw new InvalidOperationException("Environment variable 'AZURE_SQL_CONNECTIONSTRING' is not configured.");
+}
 
-// Get JWT key from environment variable for production
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var jwtKey = builder.Environment.IsProduction()
-    ? Environment.GetEnvironmentVariable("JWT_KEY") ?? jwtSettings["Key"]
-    : jwtSettings["Key"];
-
-var key = Encoding.UTF8.GetBytes(jwtKey!);
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
@@ -40,20 +34,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"] ?? "TennisAPI",
-        ValidAudience = jwtSettings["Audience"] ?? "TennisUsers",
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
 });
 
 builder.Services.AddAuthorization(options =>
 {
+    // Policy: Only Admins can manage users
     options.AddPolicy("AdminOnly", policy =>
         policy.RequireRole("SystemAdmin", "Admin"));
 
+    // Policy: Admin or System Admin can approve registrations
     options.AddPolicy("ApproveRegistrations", policy =>
         policy.RequireRole("SystemAdmin", "Admin"));
 
+    // Policy: Only approved players
     options.AddPolicy("ApprovedPlayersOnly", policy =>
         policy.RequireRole("SystemAdmin", "Admin", "Player"));
 });
@@ -67,113 +64,32 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 
-// Add CORS with dynamic frontend URL
-var frontendUrl = builder.Environment.IsProduction()
-    ? Environment.GetEnvironmentVariable("FRONTEND_URL") ?? "http://localhost:5173"
-    : "http://localhost:5173";
-
+// Add CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend", policy =>
+    options.AddPolicy("AllowLocalhost", builder =>
     {
-        policy.WithOrigins(frontendUrl, "http://localhost:5173", "http://localhost:3000")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
+        builder.WithOrigins(
+                "http://localhost:5173", 
+                "http://localhost:3000",
+                "https://csp-group-4.vercel.app"
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 
 var app = builder.Build();
 
-// Add health check endpoint for debugging
-app.MapGet("/", () => Results.Ok(new { 
-    status = "running", 
-    environment = app.Environment.EnvironmentName,
-    timestamp = DateTime.UtcNow 
-}));
+app.MapOpenApi();
+app.MapScalarApiReference();
 
-app.MapGet("/health", () => Results.Ok(new { 
-    status = "healthy", 
-    environment = app.Environment.EnvironmentName 
-}));
-
-// Apply EF Core migrations at startup
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    var logger = scope.ServiceProvider
-        .GetRequiredService<ILoggerFactory>()
-        .CreateLogger("StartupMigration");
-
-    bool tableExists(string tableName)
-    {
-        var connection = dbContext.Database.GetDbConnection();
-        var shouldClose = connection.State != ConnectionState.Open;
-
-        if (shouldClose)
-        {
-            connection.Open();
-        }
-
-        try
-        {
-            using var command = connection.CreateCommand();
-            command.CommandText = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = @tableName";
-
-            var parameter = command.CreateParameter();
-            parameter.ParameterName = "@tableName";
-            parameter.Value = tableName;
-            command.Parameters.Add(parameter);
-
-            var result = command.ExecuteScalar();
-            return Convert.ToInt32(result) > 0;
-        }
-        finally
-        {
-            if (shouldClose)
-            {
-                connection.Close();
-            }
-        }
-    }
-
-    try
-    {
-        var schemaAlreadyExists = tableExists("Users") || tableExists("users") ||
-                                  tableExists("Roles") || tableExists("roles");
-
-        if (schemaAlreadyExists)
-        {
-            logger.LogWarning("Existing database tables detected. Skipping automatic migration to avoid duplicate table creation.");
-        }
-        else
-        {
-            dbContext.Database.Migrate();
-        }
-    }
-    catch (Exception ex) when (ex.Message.Contains("already exists", StringComparison.OrdinalIgnoreCase))
-    {
-        logger.LogWarning(ex, "Table(s) already exist. Continuing startup without applying migrations.");
-    }
-}
-
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
-
-app.UseCors("AllowFrontend");
+app.UseCors("AllowLocalhost");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.MapGet("/api", () => Results.Ok(new { 
-    message = "TMS API is running", 
-    version = "1.0",
-    endpoints = new [] { "/api/auth/login", "/api/auth/signup", "/api/admin", "/api/test", "/health" }
-}));
 
 app.Run();
