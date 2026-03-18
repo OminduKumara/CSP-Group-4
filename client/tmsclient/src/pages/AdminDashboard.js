@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import TournamentManagement from '../components/TournamentManagement';
 import TournamentCalendar from '../components/TournamentCalendar';
 import TournamentBracket from '../components/TournamentBracket';
+import LiveScoring from './LiveScoring';
 
 import { API_ENDPOINTS } from '../config/api';
 import '../styles/AdminDashboard.css';
@@ -24,7 +25,13 @@ export default function AdminDashboard() {
   const username = auth.user?.username || '';
   const role = auth.user?.role;
 
-  const [activeTab, setActiveTab] = useState('tournaments');
+  const [activeTab, setActiveTabRaw] = useState(
+    () => sessionStorage.getItem('adminActiveTab') || 'tournaments'
+  );
+  const setActiveTab = (tab) => {
+    sessionStorage.setItem('adminActiveTab', tab);
+    setActiveTabRaw(tab);
+  };
   const [pendingRequests, setPendingRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -206,26 +213,42 @@ export default function AdminDashboard() {
               onClick: () => setActiveTab('bracket')
             },
             'Tournament Bracket'
+          ),
+          React.createElement('button',
+            {
+              className: `tab-button ${activeTab === 'live-scoring' ? 'active' : ''}`,
+              onClick: () => setActiveTab('live-scoring')
+            },
+            'Live Scoring'
           )
         ),
 
         React.createElement('div', { className: 'tabs-content' }, [
           activeTab === 'tournaments' && React.createElement(
             TournamentManagement,
-            { token: auth.token, onTournamentAdded: handleTournamentAdded }
+            { token: auth.token, onTournamentAdded: handleTournamentAdded, key: "tab-tournaments" }
           ),
 
           activeTab === 'calendar' && React.createElement(
             TournamentCalendar,
-            { token: auth.token, refreshTrigger: tournamentRefresh }
+            { token: auth.token, refreshTrigger: tournamentRefresh, key: "tab-calendar" }
           ),
 
           activeTab === 'bracket' && React.createElement(
             TournamentBracket,
-            { token: auth.token }
+            {
+              token: auth.token,
+              key: "tab-bracket",
+              onOpenLiveScoring: () => setActiveTab('live-scoring')
+            }
           ),
 
-          activeTab === 'approvals' && React.createElement('div', { className: 'approvals-tab' },
+          activeTab === 'live-scoring' && React.createElement(
+            LiveScoring,
+            { key: "tab-live-scoring" }
+          ),
+
+          activeTab === 'approvals' && React.createElement('div', { className: 'approvals-tab', key: "tab-approvals" },
             React.createElement('h2', null, 'Pending Registration Requests'),
 
             error && React.createElement('div', { className: 'error-message' }, error),

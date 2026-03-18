@@ -18,49 +18,80 @@
   letter-spacing: 0.5px;
 }
 
-/* ========== TOURNAMENT SELECTOR ========== */
-.tournament-selector {
-  background: #ffffff;
-  padding: 20px 30px;
-  border-radius: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  margin-bottom: 30px;
+/* ========== TOURNAMENT PICKER ========== */
+.tournament-picker { padding: 0.5rem 0; margin-bottom: 24px; }
+.picker-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 12px;
+}
+.tournament-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tournament-card-btn {
   display: flex;
   align-items: center;
-  gap: 15px;
+  justify-content: space-between;
+  background: #fff;
+  border: 2px solid #ddd;
+  border-radius: 0;
+  padding: 14px 20px;
+  cursor: pointer;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: border-color 0.2s, background 0.2s;
+  text-align: left;
 }
-
-.tournament-selector label {
+.tournament-card-btn:hover {
+  border-color: #d53135;
+  background: #fff5f5;
+}
+.tc-name {
+  font-size: 1rem;
+  font-weight: 700;
   color: #1a1a1a;
+}
+.tc-arrow {
+  font-size: 0.82rem;
   font-weight: 600;
+  color: #d53135;
+}
+.bracket-active-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1a1a1a;
+  border-radius: 0;
+  padding: 14px 20px;
+  margin-bottom: 24px;
+}
+.bracket-tournament-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin: 0;
 }
-
-.tournament-dropdown {
-  flex: 1;
-  max-width: 400px;
-  padding: 10px 15px;
-  border: 2px solid #d53135;
+.btn-change-tournament {
+  background: transparent;
+  color: #d53135;
+  border: 1.5px solid #d53135;
   border-radius: 0;
-  font-size: 16px;
-  background: #ffffff;
-  color: #1a1a1a;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
   cursor: pointer;
-  font-weight: 500;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: background 0.2s, color 0.2s;
 }
+.btn-change-tournament:hover { background: #d53135; color: #fff; }
 
-.tournament-dropdown:hover {
-  border-color: #a82429;
-  background: #f8f8f8;
-}
-
-.tournament-dropdown:focus {
-  outline: none;
-  border-color: #a82429;
-  box-shadow: 0 0 0 3px rgba(213, 49, 53, 0.1);
-}
 
 /* ========== LOADING & ERROR STATES ========== */
 .loading {

@@ -12,15 +12,21 @@ public class BracketController : ControllerBase
     private readonly ITournamentTeamRepository _teamRepository;
     private readonly ITournamentMatchRepository _matchRepository;
     private readonly ITournamentRepository _tournamentRepository;
+    private readonly IMatchScoreRepository _scoreRepository;
+    private readonly ILiveGameScoreRepository _liveGameScoreRepository;
 
     public BracketController(
         ITournamentTeamRepository teamRepository,
         ITournamentMatchRepository matchRepository,
-        ITournamentRepository tournamentRepository)
+        ITournamentRepository tournamentRepository,
+        IMatchScoreRepository scoreRepository,
+        ILiveGameScoreRepository liveGameScoreRepository)
     {
         _teamRepository = teamRepository;
         _matchRepository = matchRepository;
         _tournamentRepository = tournamentRepository;
+        _scoreRepository = scoreRepository;
+        _liveGameScoreRepository = liveGameScoreRepository;
     }
 
     // ==================== TEAMS ENDPOINTS ====================
@@ -169,6 +175,99 @@ public class BracketController : ControllerBase
     }
 
     // ==================== MATCHES ENDPOINTS ====================
+
+        /// <summary>
+        /// GET all set scores for a match
+        /// </summary>
+        [HttpGet("matches/{matchId}/scores")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<MatchScore>>> GetMatchScores(int tournamentId, int matchId)
+        {
+            var match = await _matchRepository.GetMatchByIdAsync(matchId);
+            if (match == null || match.TournamentId != tournamentId)
+                return NotFound(new { message = "Match not found" });
+            var scores = await _scoreRepository.GetScoresForMatchAsync(matchId);
+            return Ok(scores);
+        }
+
+        /// <summary>
+        /// PUT update set score for a match (admin only)
+        /// </summary>
+        [HttpPut("matches/{matchId}/scores/{setNumber}")]
+        [Authorize]
+        public async Task<ActionResult> UpdateMatchSetScore(int tournamentId, int matchId, int setNumber, [FromBody] UpdateSetScoreRequest request)
+        {
+            var match = await _matchRepository.GetMatchByIdAsync(matchId);
+            if (match == null || match.TournamentId != tournamentId)
+                return NotFound(new { message = "Match not found" });
+            var score = new MatchScore
+            {
+                MatchId = matchId,
+                SetNumber = setNumber,
+                Team1Games = request.Team1Games,
+                Team2Games = request.Team2Games,
+                Team1TieBreak = request.Team1TieBreak,
+                Team2TieBreak = request.Team2TieBreak
+            };
+            await _scoreRepository.AddOrUpdateScoreAsync(score);
+            return Ok(new { message = "Set score updated", score });
+        }
+
+        /// <summary>
+        /// DELETE remove set score for a match (admin only)
+        /// </summary>
+        [HttpDelete("matches/{matchId}/scores/{setNumber}")]
+        [Authorize]
+        public async Task<ActionResult> DeleteMatchSetScore(int tournamentId, int matchId, int setNumber)
+        {
+            var match = await _matchRepository.GetMatchByIdAsync(matchId);
+            if (match == null || match.TournamentId != tournamentId)
+                return NotFound(new { message = "Match not found" });
+            
+            var deleted = await _scoreRepository.DeleteScoreAsync(matchId, setNumber);
+            if (!deleted)
+                return StatusCode(500, new { message = "Failed or already deleted" });
+            
+            return Ok(new { message = "Set score deleted" });
+        }
+
+        /// <summary>
+        /// GET live game score for a match
+        /// </summary>
+        [HttpGet("matches/{matchId}/live")]
+        [AllowAnonymous]
+        public async Task<ActionResult<LiveGameScore>> GetLiveGameScore(int tournamentId, int matchId)
+        {
+            var match = await _matchRepository.GetMatchByIdAsync(matchId);
+            if (match == null || match.TournamentId != tournamentId)
+                return NotFound(new { message = "Match not found" });
+            var score = await _liveGameScoreRepository.GetLiveScoreAsync(matchId);
+            if (score == null)
+                return Ok(new LiveGameScore { MatchId = matchId });
+            return Ok(score);
+        }
+
+        /// <summary>
+        /// PUT update live game score for a match (admin only)
+        /// </summary>
+        [HttpPut("matches/{matchId}/live")]
+        [Authorize]
+        public async Task<ActionResult> UpdateLiveGameScore(int tournamentId, int matchId, [FromBody] UpdateLiveGameScoreRequest request)
+        {
+            var match = await _matchRepository.GetMatchByIdAsync(matchId);
+            if (match == null || match.TournamentId != tournamentId)
+                return NotFound(new { message = "Match not found" });
+            var score = new LiveGameScore
+            {
+                MatchId = matchId,
+                Team1Points = request.Team1Points,
+                Team2Points = request.Team2Points,
+                ServingTeamId = request.ServingTeamId,
+                UpdatedAt = DateTime.UtcNow
+            };
+            await _liveGameScoreRepository.SetLiveScoreAsync(score);
+            return Ok(new { message = "Live game score updated", score });
+        }
 
     /// <summary>
     /// GET all matches for tournament
@@ -494,4 +593,19 @@ public class CreateMatchRequest
 public class UpdateMatchRequest
 {
     public int? WinnerId { get; set; }
+}
+
+public class UpdateSetScoreRequest
+{
+    public int Team1Games { get; set; }
+    public int Team2Games { get; set; }
+    public int? Team1TieBreak { get; set; }
+    public int? Team2TieBreak { get; set; }
+}
+
+public class UpdateLiveGameScoreRequest
+{
+    public string Team1Points { get; set; } = "0";
+    public string Team2Points { get; set; } = "0";
+    public int? ServingTeamId { get; set; }
 }
