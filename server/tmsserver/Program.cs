@@ -66,6 +66,8 @@ builder.Services.AddScoped<ITournamentRepository, TournamentRepository>();
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<ITournamentTeamRepository, TournamentTeamRepository>();
 builder.Services.AddScoped<ITournamentMatchRepository, TournamentMatchRepository>();
+builder.Services.AddScoped<IMatchScoreRepository, MatchScoreRepository>();
+builder.Services.AddScoped<ILiveGameScoreRepository, LiveGameScoreRepository>();
 
 // Add services
 builder.Services.AddScoped<UserService>();
@@ -244,6 +246,37 @@ static async Task InitializeDatabaseAsync(string connectionString)
                         CREATE INDEX idx_tournament_matches_teams ON dbo.TournamentMatches(Team1Id, Team2Id);
                         CREATE INDEX idx_tournament_matches_winner ON dbo.TournamentMatches(WinnerId);
                         CREATE INDEX idx_tournament_matches_playoff ON dbo.TournamentMatches(IsPlayoff);
+                    END;
+
+                    IF OBJECT_ID('dbo.MatchScores', 'U') IS NULL
+                    BEGIN
+                        CREATE TABLE dbo.MatchScores (
+                            Id INT PRIMARY KEY IDENTITY(1,1),
+                            MatchId INT NOT NULL,
+                            SetNumber INT NOT NULL,
+                            Team1Games INT NOT NULL DEFAULT 0,
+                            Team2Games INT NOT NULL DEFAULT 0,
+                            Team1TieBreak INT NULL,
+                            Team2TieBreak INT NULL,
+                            CreatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+                            UpdatedAt DATETIME NULL,
+                            CONSTRAINT FK_MatchScores_Match FOREIGN KEY (MatchId) REFERENCES dbo.TournamentMatches(Id) ON DELETE CASCADE,
+                            CONSTRAINT UQ_MatchScores_Set UNIQUE(MatchId, SetNumber)
+                        );
+                        CREATE INDEX idx_match_scores_match ON dbo.MatchScores(MatchId);
+                    END;
+
+                    IF OBJECT_ID('dbo.LiveGameScores', 'U') IS NULL
+                    BEGIN
+                        CREATE TABLE dbo.LiveGameScores (
+                            MatchId INT PRIMARY KEY,
+                            Team1Points VARCHAR(10) NOT NULL DEFAULT '0',
+                            Team2Points VARCHAR(10) NOT NULL DEFAULT '0',
+                            ServingTeamId INT NULL,
+                            UpdatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+                            CONSTRAINT FK_LiveGameScores_Match FOREIGN KEY (MatchId) REFERENCES dbo.TournamentMatches(Id) ON DELETE CASCADE,
+                            CONSTRAINT FK_LiveGameScores_ServingTeam FOREIGN KEY (ServingTeamId) REFERENCES dbo.TournamentTeams(Id) ON DELETE NO ACTION
+                        );
                     END
                 ";
                 await command.ExecuteNonQueryAsync();

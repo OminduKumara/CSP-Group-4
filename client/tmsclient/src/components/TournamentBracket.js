@@ -4,13 +4,19 @@ import { tournamentService } from '../services/tournamentService';
 import bracketService from '../services/bracketService';
 import { useAuth } from '../contexts/AuthContext';
 
-const TournamentBracket = () => {
-  // Auth context
+const TournamentBracket = ({ onOpenLiveScoring }) => {
   const { user, token } = useAuth();
 
   // Tournament selection
   const [tournaments, setTournaments] = useState([]);
-  const [selectedTournamentId, setSelectedTournamentId] = useState(null);
+  const [selectedTournamentId, setSelectedTournamentIdRaw] = useState(
+    () => { const v = sessionStorage.getItem('bracket_tournament'); return v ? parseInt(v) : null; }
+  );
+  const setSelectedTournamentId = (v) => {
+    if (v) sessionStorage.setItem('bracket_tournament', v);
+    else sessionStorage.removeItem('bracket_tournament');
+    setSelectedTournamentIdRaw(v);
+  };
   const [loadingTournaments, setLoadingTournaments] = useState(true);
 
   // Teams and matches from database
@@ -150,6 +156,47 @@ const TournamentBracket = () => {
   };
 
   // ==================== MATCH MANAGEMENT ====================
+
+  const handleMatchClick = async (matchInfo, isTiebreaker = false) => {
+    if (!selectedTournamentId) return;
+
+    // If no token, just open for viewing (read-only) — still stay in dashboard
+    if (!token) {
+      sessionStorage.setItem('ls_tournament', String(selectedTournamentId));
+      if (matchInfo.dbId) sessionStorage.setItem('ls_match', String(matchInfo.dbId));
+      if (onOpenLiveScoring) onOpenLiveScoring();
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      let dbMatchId = matchInfo.dbId;
+      if (!dbMatchId) {
+        const createdMatch = await bracketService.createMatch(
+          selectedTournamentId,
+          {
+            Team1Id: matchInfo.team1.id,
+            Team2Id: matchInfo.team2.id,
+            IsPlayoff: isTiebreaker,
+          },
+          token
+        );
+        dbMatchId = createdMatch.id;
+      }
+
+      // Write selections to sessionStorage then switch tab — no page navigation
+      sessionStorage.setItem('ls_tournament', String(selectedTournamentId));
+      sessionStorage.setItem('ls_match', String(dbMatchId));
+      if (onOpenLiveScoring) onOpenLiveScoring();
+    } catch (err) {
+      console.error('Failed to prepare match for scoring:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const generateMatchups = () => {
     const matchups = [];
@@ -404,24 +451,37 @@ const TournamentBracket = () => {
       {error && <div className="error-message">{error}</div>}
 
       {/* TOURNAMENT SELECTOR */}
-      {loadingTournaments ? (
-        <div className="loading">Loading tournaments...</div>
-      ) : (
-        <div className="tournament-selector">
-          <label htmlFor="tournament-select">Select Tournament:</label>
-          <select
-            id="tournament-select"
-            value={selectedTournamentId || ''}
-            onChange={(e) => setSelectedTournamentId(e.target.value ? parseInt(e.target.value) : null)}
-            className="tournament-dropdown"
-          >
-            <option value="">-- Choose a tournament --</option>
-            {tournaments.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
+      {!selectedTournamentId && (
+        loadingTournaments ? (
+          <div className="loading">Loading tournaments...</div>
+        ) : (
+          <div className="tournament-picker">
+            <p className="picker-label">Select a tournament to view its bracket:</p>
+            <div className="tournament-cards">
+              {tournaments.map(t => (
+                <button
+                  key={t.id}
+                  className="tournament-card-btn"
+                  onClick={() => setSelectedTournamentId(parseInt(t.id))}
+                >
+                  <span className="tc-name">{t.name}</span>
+                  <span className="tc-arrow">Select &rarr;</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )
+      )}
+
+      {selectedTournamentId && (
+        <div className="bracket-active-header">
+          <span className="bracket-tournament-name">
+            {tournaments.find(t => t.id === selectedTournamentId)?.name || 'Tournament'}
+          </span>
+          <button
+            className="btn-change-tournament"
+            onClick={() => setSelectedTournamentId(null)}
+          >Change</button>
         </div>
       )}
 
@@ -552,27 +612,31 @@ const TournamentBracket = () => {
               ) : (
                 <div className="matchups-grid">
                   {matchups.map((match) => (
-                    <div key={match.key} className="match-card">
+                    <div 
+                      key={match.key} 
+                      className="match-card" 
+                      onClick={() => handleMatchClick(match, false)} 
+                      style={{ cursor: 'pointer' }}
+                    >
                       <div className="match-team team1">
-                        <button
+                        <div
                           className={`team-btn ${match.winner === match.team1.id ? 'winner' : ''}`}
-                          onClick={() => handleMatchWinner(match.key, match.team1.id)}
-                          disabled={savingMatch === match.key || !token}
                         >
                           {match.winner === match.team1.id && '✓ '}
                           {match.team1.teamName}
-                        </button>
+                        </div>
                       </div>
-                      <div className="match-vs">vs</div>
+                      <div className="match-vs">
+                        <div style={{marginBottom: "5px"}}>vs</div>
+                        <div style={{fontSize: '0.75rem', color: '#3498db', textDecoration: 'underline'}}>Score Match</div>
+                      </div>
                       <div className="match-team team2">
-                        <button
+                        <div
                           className={`team-btn ${match.winner === match.team2.id ? 'winner' : ''}`}
-                          onClick={() => handleMatchWinner(match.key, match.team2.id)}
-                          disabled={savingMatch === match.key || !token}
                         >
                           {match.winner === match.team2.id && '✓ '}
                           {match.team2.teamName}
-                        </button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -591,28 +655,32 @@ const TournamentBracket = () => {
               <div className="matchups-container">
                 <div className="matchups-grid">
                   {tiebreakers_list.map((tb) => (
-                    <div key={tb.key} className="match-card tiebreaker-card">
+                    <div 
+                      key={tb.key} 
+                      className="match-card tiebreaker-card" 
+                      onClick={() => handleMatchClick(tb, true)} 
+                      style={{ cursor: 'pointer' }}
+                    >
                       <div className="tiebreaker-badge">PLAYOFF</div>
                       <div className="match-team team1">
-                        <button
+                        <div
                           className={`team-btn ${tb.winner === tb.team1.id ? 'winner' : ''}`}
-                          onClick={() => handleTiebreakerWinner(tb.key, tb.team1.id)}
-                          disabled={savingMatch === tb.key || !token}
                         >
                           {tb.winner === tb.team1.id && '✓ '}
                           {tb.team1.teamName}
-                        </button>
+                        </div>
                       </div>
-                      <div className="match-vs">vs</div>
+                      <div className="match-vs">
+                        <div style={{marginBottom: "5px"}}>vs</div>
+                        <div style={{fontSize: '0.75rem', color: '#3498db', textDecoration: 'underline'}}>Score Match</div>
+                      </div>
                       <div className="match-team team2">
-                        <button
+                        <div
                           className={`team-btn ${tb.winner === tb.team2.id ? 'winner' : ''}`}
-                          onClick={() => handleTiebreakerWinner(tb.key, tb.team2.id)}
-                          disabled={savingMatch === tb.key || !token}
                         >
                           {tb.winner === tb.team2.id && '✓ '}
                           {tb.team2.teamName}
-                        </button>
+                        </div>
                       </div>
                     </div>
                   ))}

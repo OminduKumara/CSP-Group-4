@@ -256,6 +256,93 @@ const bracketService = {
       throw new Error(error.response?.data?.message || 'Failed to fetch standings');
     }
   }
+    ,
+
+    // ==================== LIVE SCORING ====================
+    /**
+     * Get all set scores for a match
+     */
+    getMatchScores: async (tournamentId, matchId) => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/tournaments/${tournamentId}/bracket/matches/${matchId}/scores`);
+        return response.data;
+      } catch (error) {
+        throw new Error(error.response?.data?.message || 'Failed to fetch match scores');
+      }
+    },
+
+    /**
+     * Update set score for a match (admin only)
+     */
+    updateMatchSetScore: async (tournamentId, matchId, setNumber, score, token) => {
+      try {
+        const response = await axios.put(
+          `${API_BASE_URL}/tournaments/${tournamentId}/bracket/matches/${matchId}/scores/${setNumber}`,
+          score,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        return response.data;
+      } catch (error) {
+        throw new Error(error.response?.data?.message || 'Failed to update set score');
+      }
+    },
+
+    /**
+     * Delete set score for a match (admin only)
+     */
+    deleteMatchSetScore: async (tournamentId, matchId, setNumber, token) => {
+      try {
+        const response = await axios.delete(
+          `${API_BASE_URL}/tournaments/${tournamentId}/bracket/matches/${matchId}/scores/${setNumber}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        );
+        return response.data;
+      } catch (error) {
+        throw new Error(error.response?.data?.message || 'Failed to delete set score');
+      }
+    },
+
+    /**
+     * Get live game score for a match
+     */
+    getLiveGameScore: async (tournamentId, matchId) => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/tournaments/${tournamentId}/bracket/matches/${matchId}/live`);
+        return response.data;
+      } catch (error) {
+        throw new Error(error.response?.data?.message || 'Failed to fetch live game score');
+      }
+    },
+
+    /**
+     * Update live game score for a match (admin only)
+     */
+    updateLiveGameScore: async (tournamentId, matchId, score, token) => {
+      try {
+        const response = await axios.put(
+          `${API_BASE_URL}/tournaments/${tournamentId}/bracket/matches/${matchId}/live`,
+          score,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        return response.data;
+      } catch (error) {
+        throw new Error(error.response?.data?.message || 'Failed to update live game score');
+      }
+    }
 };
 
 export default bracketService;
