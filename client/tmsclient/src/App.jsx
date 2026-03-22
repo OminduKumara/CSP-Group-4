@@ -9,6 +9,7 @@ import ProtectedRoute from './pages/ProtectedRoute';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LiveScoring from './pages/LiveScoring';
 import LiveScoreView from './pages/LiveScoreView';
+import InventoryPage from './pages/InventoryPage';
 import './App.css';
 
 function isAdminRole(role) {
@@ -74,6 +75,14 @@ function AppRoutes() {
         />
       {/* 2. Updated fallback to catch bad URLs and send them home */}
       <Route path="*" element={<Navigate to="/" />} />
+      <Route
+        path="/inventory"
+        element={
+          <ProtectedRoute roles={["Player","Admin","SystemAdmin"]}>
+            <InventoryPage isAdmin={isAdminRole(user?.role)} userId={user?.id} />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }

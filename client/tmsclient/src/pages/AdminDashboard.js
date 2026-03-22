@@ -5,6 +5,7 @@ import TournamentManagement from '../components/TournamentManagement';
 import TournamentCalendar from '../components/TournamentCalendar';
 import TournamentBracket from '../components/TournamentBracket';
 import LiveScoring from './LiveScoring';
+import InventoryPage from './InventoryPage';
 
 import { API_ENDPOINTS } from '../config/api';
 import '../styles/AdminDashboard.css';
@@ -221,6 +222,14 @@ export default function AdminDashboard() {
             },
             'Live Scoring'
           )
+           ,
+           React.createElement('button',
+             {
+               className: `tab-button ${activeTab === 'inventory' ? 'active' : ''}`,
+               onClick: () => setActiveTab('inventory')
+             },
+             'Inventory'
+           )
         ),
 
         React.createElement('div', { className: 'tabs-content' }, [
@@ -247,6 +256,11 @@ export default function AdminDashboard() {
             LiveScoring,
             { key: "tab-live-scoring" }
           ),
+
+           activeTab === 'inventory' && React.createElement(
+             InventoryPage,
+             { isAdmin: true, userId: auth.user?.id, key: "tab-inventory" }
+           ),
 
           activeTab === 'approvals' && React.createElement('div', { className: 'approvals-tab', key: "tab-approvals" },
             React.createElement('h2', null, 'Pending Registration Requests'),

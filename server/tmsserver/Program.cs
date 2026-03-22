@@ -8,7 +8,9 @@ using tmsserver.Data;
 using tmsserver.Data.Repositories;
 using tmsserver.Services;
 
-LoadDotEnv();
+
+// Load .env file for environment variables
+DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -276,6 +278,35 @@ static async Task InitializeDatabaseAsync(string connectionString)
                             UpdatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
                             CONSTRAINT FK_LiveGameScores_Match FOREIGN KEY (MatchId) REFERENCES dbo.TournamentMatches(Id) ON DELETE CASCADE,
                             CONSTRAINT FK_LiveGameScores_ServingTeam FOREIGN KEY (ServingTeamId) REFERENCES dbo.TournamentTeams(Id) ON DELETE NO ACTION
+                        );
+                    END;
+
+                    IF OBJECT_ID('dbo.Inventory', 'U') IS NULL
+                    BEGIN
+                        CREATE TABLE dbo.Inventory (
+                            Id INT IDENTITY(1,1) PRIMARY KEY,
+                            Name NVARCHAR(100) NOT NULL,
+                            Description NVARCHAR(255),
+                            Quantity INT NOT NULL,
+                            Category NVARCHAR(100),
+                            CreatedAt DATETIME NOT NULL,
+                            UpdatedAt DATETIME NULL
+                        );
+                    END;
+
+                    IF OBJECT_ID('dbo.InventoryTransaction', 'U') IS NULL
+                    BEGIN
+                        CREATE TABLE dbo.InventoryTransaction (
+                            Id INT IDENTITY(1,1) PRIMARY KEY,
+                            InventoryItemId INT NOT NULL,
+                            IssuedToUserId INT NULL,
+                            QuantityChanged INT NOT NULL,
+                            Comment NVARCHAR(255),
+                            Timestamp DATETIME NOT NULL,
+                            PerformedByAdminId INT NULL,
+                            CONSTRAINT FK_InventoryTransaction_Inventory FOREIGN KEY (InventoryItemId) REFERENCES dbo.Inventory(Id),
+                            CONSTRAINT FK_InventoryTransaction_IssuedToUser FOREIGN KEY (IssuedToUserId) REFERENCES dbo.Users(Id),
+                            CONSTRAINT FK_InventoryTransaction_PerformedByAdmin FOREIGN KEY (PerformedByAdminId) REFERENCES dbo.Users(Id)
                         );
                     END
                 ";
