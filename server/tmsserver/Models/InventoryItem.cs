@@ -11,6 +11,7 @@ namespace tmsserver.Models
         public string? Category { get; set; } // e.g., Racket, Ball, etc.
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public string? Condition { get; set; } // e.g., damaged, cracked, good
     }
 
     public class InventoryTransaction

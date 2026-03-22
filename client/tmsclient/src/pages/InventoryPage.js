@@ -41,6 +41,10 @@ const InventoryPage = ({ isAdmin, userId }) => {
   const [itemName, setItemName] = useState("");
   const [itemQty, setItemQty] = useState(1);
   const [itemCategory, setItemCategory] = useState("");
+  const [itemCondition, setItemCondition] = useState("");
+  const [editingCondition, setEditingCondition] = useState("");
+  const [inlineEditId, setInlineEditId] = useState(null);
+  const [inlineCondition, setInlineCondition] = useState("");
   const [transactions, setTransactions] = useState([]);
   const [issueQty, setIssueQty] = useState(1);
   const [issueComment, setIssueComment] = useState("");
@@ -104,6 +108,7 @@ const InventoryPage = ({ isAdmin, userId }) => {
       name: itemName,
       quantity: itemQty,
       category: itemCategory,
+      condition: itemCondition,
       description: ""
     }, {
       headers: { Authorization: `Bearer ${auth.token}` }
@@ -111,7 +116,40 @@ const InventoryPage = ({ isAdmin, userId }) => {
     setItemName("");
     setItemQty(1);
     setItemCategory("");
+    setItemCondition("");
     fetchInventory();
+  };
+
+  const handleUpdateCondition = async () => {
+    try {
+      await axios.put(`/api/inventory/condition/${selectedItem.id}`, {
+        condition: editingCondition
+      }, {
+        headers: { Authorization: `Bearer ${auth.token}` }
+      });
+      fetchInventory();
+      setSelectedItem({...selectedItem, condition: editingCondition});
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const saveInlineCondition = async (id) => {
+    try {
+      await axios.put(`/api/inventory/condition/${id}`, {
+        condition: inlineCondition
+      }, {
+        headers: { Authorization: `Bearer ${auth.token}` }
+      });
+      setInlineEditId(null);
+      fetchInventory();
+      if (selectedItem?.id === id) {
+        setSelectedItem({...selectedItem, condition: inlineCondition});
+        setEditingCondition(inlineCondition);
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleDeleteItem = async (itemId) => {
@@ -187,6 +225,7 @@ const InventoryPage = ({ isAdmin, userId }) => {
             <input className="inv-input" value={itemName} onChange={e => setItemName(e.target.value)} placeholder="Item Name" />
             <input className="inv-input" type="number" style={{width: '80px'}} value={itemQty} onChange={e => setItemQty(Number(e.target.value))} min={1} />
             <input className="inv-input" value={itemCategory} onChange={e => setItemCategory(e.target.value)} placeholder="Category" />
+            <input className="inv-input" value={itemCondition} onChange={e => setItemCondition(e.target.value)} placeholder="Condition (Cracked, Good)" />
             <button className="inv-btn-primary" onClick={handleAddItem}>Add Item</button>
           </div>
         )}
@@ -202,6 +241,7 @@ const InventoryPage = ({ isAdmin, userId }) => {
                 <tr>
                   <th>Name</th>
                   <th>Category</th>
+                  <th>Condition</th>
                   <th>Qty</th>
                   <th>Added</th>
                   {isAdmin && <th>Actions</th>}
@@ -209,16 +249,39 @@ const InventoryPage = ({ isAdmin, userId }) => {
               </thead>
               <tbody>
                 {inventory.length === 0 && (
-                  <tr><td colSpan={isAdmin ? "5" : "4"} className="empty-state">No items found in inventory.</td></tr>
+                  <tr><td colSpan={isAdmin ? "6" : "5"} className="empty-state">No items found in inventory.</td></tr>
                 )}
                 {inventory.map(item => (
                   <tr 
                     key={item.id} 
                     className={selectedItem?.id === item.id ? "selected-row" : ""} 
-                    onClick={() => setSelectedItem(item)}
+                    onClick={() => { setSelectedItem(item); setEditingCondition(item.condition || ""); }}
                   >
                     <td><strong>{item.name}</strong></td>
                     <td><span className="badge">{item.category}</span></td>
+                    <td>
+                      {inlineEditId === item.id ? (
+                        <div style={{display:'flex', gap:'5px'}} onClick={e=>e.stopPropagation()}>
+                          <input autoFocus value={inlineCondition} onChange={e=>setInlineCondition(e.target.value)} className="inv-input" style={{padding:'2px 5px', width:'100px'}} />
+                          <button onClick={() => saveInlineCondition(item.id)} className="inv-btn-primary" style={{padding:'2px 6px'}} >✓</button>
+                          <button onClick={() => setInlineEditId(null)} className="inv-btn-danger" style={{padding:'2px 6px'}} >✕</button>
+                        </div>
+                      ) : (
+                        <span 
+                          className="badge" 
+                          style={{background: '#fef3c7', color: '#d97706', cursor: isAdmin ? 'pointer' : 'default'}}
+                          onClick={(e) => {
+                            if (isAdmin) {
+                              e.stopPropagation();
+                              setInlineEditId(item.id);
+                              setInlineCondition(item.condition || "");
+                            }
+                          }}
+                        >
+                          {item.condition || "Good"} {isAdmin && " ✎"}
+                        </span>
+                      )}
+                    </td>
                     <td>{item.quantity}</td>
                     <td>{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A'}</td>
                     {isAdmin && (

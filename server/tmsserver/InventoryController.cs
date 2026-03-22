@@ -20,7 +20,7 @@ namespace tmsserver
             using (var conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-                var cmd = new SqlCommand("SELECT Id, Name, Description, Quantity, Category, CreatedAt, UpdatedAt FROM Inventory", conn);
+                var cmd = new SqlCommand("SELECT Id, Name, Description, Quantity, Category, CreatedAt, UpdatedAt, Condition FROM Inventory", conn);
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -33,7 +33,8 @@ namespace tmsserver
                             Quantity = reader.GetInt32(3),
                             Category = reader.IsDBNull(4) ? null : reader.GetString(4),
                             CreatedAt = reader.GetDateTime(5),
-                            UpdatedAt = reader.IsDBNull(6) ? (DateTime?)null : reader.GetDateTime(6)
+                            UpdatedAt = reader.IsDBNull(6) ? (DateTime?)null : reader.GetDateTime(6),
+                            Condition = reader.IsDBNull(7) ? null : reader.GetString(7)
                         });
                     }
                 }
@@ -48,11 +49,12 @@ namespace tmsserver
             {
                 conn.Open();
                 var cmd = new SqlCommand(
-                    "INSERT INTO Inventory (Name, Description, Quantity, Category, CreatedAt) OUTPUT INSERTED.Id VALUES (@Name, @Description, @Quantity, @Category, @CreatedAt)", conn);
+                    "INSERT INTO Inventory (Name, Description, Quantity, Category, Condition, CreatedAt) OUTPUT INSERTED.Id VALUES (@Name, @Description, @Quantity, @Category, @Condition, @CreatedAt)", conn);
                 cmd.Parameters.AddWithValue("@Name", item.Name ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@Description", item.Description ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@Quantity", item.Quantity);
                 cmd.Parameters.AddWithValue("@Category", item.Category ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@Condition", item.Condition ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow);
                 item.Id = (int)cmd.ExecuteScalar();
                 item.CreatedAt = DateTime.UtcNow;
@@ -72,6 +74,27 @@ namespace tmsserver
                 txCmd.ExecuteNonQuery();
 
                 var cmd = new SqlCommand("DELETE FROM Inventory WHERE Id = @Id", conn);
+                cmd.Parameters.AddWithValue("@Id", id);
+                int rows = cmd.ExecuteNonQuery();
+                if (rows == 0) return NotFound();
+            }
+            return Ok();
+        }
+
+        public class UpdateConditionRequest
+        {
+            public string? Condition { get; set; }
+        }
+
+        [HttpPut("condition/{id}")]
+        public ActionResult UpdateCondition(int id, [FromBody] UpdateConditionRequest req)
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                var cmd = new SqlCommand("UPDATE Inventory SET Condition = @Condition, UpdatedAt = @UpdatedAt WHERE Id = @Id", conn);
+                cmd.Parameters.AddWithValue("@Condition", string.IsNullOrWhiteSpace(req.Condition) ? (object)DBNull.Value : req.Condition);
+                cmd.Parameters.AddWithValue("@UpdatedAt", DateTime.UtcNow);
                 cmd.Parameters.AddWithValue("@Id", id);
                 int rows = cmd.ExecuteNonQuery();
                 if (rows == 0) return NotFound();

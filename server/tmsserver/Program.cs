@@ -290,8 +290,16 @@ static async Task InitializeDatabaseAsync(string connectionString)
                             Quantity INT NOT NULL,
                             Category NVARCHAR(100),
                             CreatedAt DATETIME NOT NULL,
-                            UpdatedAt DATETIME NULL
+                            UpdatedAt DATETIME NULL,
+                            Condition NVARCHAR(100) NULL
                         );
+                    END
+                    ELSE
+                    BEGIN
+                        IF COL_LENGTH('dbo.Inventory', 'Condition') IS NULL
+                        BEGIN
+                            ALTER TABLE dbo.Inventory ADD Condition NVARCHAR(100) NULL;
+                        END
                     END;
 
                     IF OBJECT_ID('dbo.InventoryTransaction', 'U') IS NULL
