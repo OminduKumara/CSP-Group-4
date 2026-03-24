@@ -50,6 +50,23 @@ CREATE TABLE IF NOT EXISTS RegistrationRequests (
     FOREIGN KEY (ReviewedByAdminId) REFERENCES Users(Id) ON DELETE SET NULL
 );
 
+CREATE TABLE IF NOT EXISTS Tournaments (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(100) NOT NULL,
+    Description VARCHAR(500),
+    Status TINYINT NOT NULL DEFAULT 0, -- 0=Scheduled, 1=InProgress, 2=Completed, 3=Cancelled
+    StartDate DATETIME NOT NULL,
+    EndDate DATETIME NOT NULL,
+    CreatedByAdminId INT NOT NULL,
+    CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt DATETIME NULL,
+    UpdatedByAdminId INT NULL,
+    FOREIGN KEY (CreatedByAdminId) REFERENCES Users(Id) ON DELETE RESTRICT,
+    FOREIGN KEY (UpdatedByAdminId) REFERENCES Users(Id) ON DELETE SET NULL,
+    INDEX idx_tournaments_status (Status),
+    INDEX idx_tournaments_dates (StartDate, EndDate)
+);
+
 -- Insert default roles
 INSERT INTO Roles (Name, Description, Permissions) VALUES
 ('SystemAdmin', 'System administrator with full access', JSON_ARRAY('*')),

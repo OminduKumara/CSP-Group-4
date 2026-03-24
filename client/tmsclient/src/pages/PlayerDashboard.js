@@ -61,6 +61,10 @@ export default function Dashboard() {
         React.createElement('div', { className: 'dashboard-card' },
           React.createElement('h3', null, 'Players'),
           React.createElement('p', null, 'Player profile')
+        ),
+        React.createElement('div', { className: 'dashboard-card', onClick: () => navigate('/inventory') },
+          React.createElement('h3', null, 'Inventory'),
+          React.createElement('p', null, 'View and request equipment')
         )
       )
     )

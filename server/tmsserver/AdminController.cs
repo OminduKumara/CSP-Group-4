@@ -5,8 +5,6 @@ using tmsserver.Models;
 using tmsserver.Services;
 using tmsserver.Data.Repositories;
 
-namespace tmsserver.Controllers;
-
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(Policy = "AdminOnly")]

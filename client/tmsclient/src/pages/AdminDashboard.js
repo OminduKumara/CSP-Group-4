@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import TournamentManagement from '../components/TournamentManagement';
+import TournamentCalendar from '../components/TournamentCalendar';
+import TournamentBracket from '../components/TournamentBracket';
+import LiveScoring from './LiveScoring';
+import InventoryPage from './InventoryPage';
+import PracticeSessionManagement from '../components/PracticeSessionManagement';
 
 import { API_ENDPOINTS } from '../config/api';
 import '../styles/AdminDashboard.css';
@@ -21,10 +27,18 @@ export default function AdminDashboard() {
   const username = auth.user?.username || '';
   const role = auth.user?.role;
 
+  const [activeTab, setActiveTabRaw] = useState(
+    () => sessionStorage.getItem('adminActiveTab') || 'tournaments'
+  );
+  const setActiveTab = (tab) => {
+    sessionStorage.setItem('adminActiveTab', tab);
+    setActiveTabRaw(tab);
+  };
   const [pendingRequests, setPendingRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [tournamentRefresh, setTournamentRefresh] = useState(0);
 
   useEffect(() => {
 
@@ -42,6 +56,7 @@ export default function AdminDashboard() {
 
     loadPending();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth.loading, auth.isAuthenticated, role]);
 
   async function loadPending() {
@@ -138,6 +153,10 @@ export default function AdminDashboard() {
     navigate('/login');
   }
 
+  function handleTournamentAdded() {
+    setTournamentRefresh(prev => prev + 1);
+  }
+
   return React.createElement(
     'div',
     { className: 'admin-dashboard-container' },
@@ -167,62 +186,155 @@ export default function AdminDashboard() {
     ),
 
     React.createElement('div', { className: 'admin-content' },
-      React.createElement('h2', null, 'Pending Registration Requests'),
-
-      error && React.createElement('div', { className: 'error-message' }, error),
-      successMessage && React.createElement('div', { className: 'success-message' }, successMessage),
-
-      loading
-        ? React.createElement('div', { className: 'loading' }, 'Loading...')
-        : pendingRequests.length === 0
-          ? React.createElement('div', { className: 'no-requests' },
-            React.createElement('p', null, 'No pending registration requests')
+      React.createElement('div', { className: 'tabs-container' },
+        React.createElement('div', { className: 'tabs-nav' },
+          React.createElement('button',
+            {
+              className: `tab-button ${activeTab === 'tournaments' ? 'active' : ''}`,
+              onClick: () => setActiveTab('tournaments')
+            },
+            'Tournament Management'
+          ),
+          React.createElement('button',
+            {
+              className: `tab-button ${activeTab === 'calendar' ? 'active' : ''}`,
+              onClick: () => setActiveTab('calendar')
+            },
+            'Tournament Calendar'
+          ),
+          React.createElement('button',
+            {
+              className: `tab-button ${activeTab === 'approvals' ? 'active' : ''}`,
+              onClick: () => setActiveTab('approvals')
+            },
+            'Player Approvals'
+          ),
+          React.createElement('button',
+            {
+              className: `tab-button ${activeTab === 'bracket' ? 'active' : ''}`,
+              onClick: () => setActiveTab('bracket')
+            },
+            'Tournament Bracket'
+          ),
+          React.createElement('button',
+            {
+              className: `tab-button ${activeTab === 'live-scoring' ? 'active' : ''}`,
+              onClick: () => setActiveTab('live-scoring')
+            },
+            'Live Scoring'
           )
-          : React.createElement('div', { className: 'requests-table' },
-            React.createElement('table', null,
-              React.createElement('thead', null,
-                React.createElement('tr', null,
-                  React.createElement('th', null, 'Username'),
-                  React.createElement('th', null, 'Identity Number'),
-                  React.createElement('th', null, 'Email'),
-                  React.createElement('th', null, 'Requested Date'),
-                  React.createElement('th', null, 'Actions')
+           ,
+           React.createElement('button',
+             {
+               className: `tab-button ${activeTab === 'inventory' ? 'active' : ''}`,
+               onClick: () => setActiveTab('inventory')
+             },
+             'Inventory'
+           )
+        ),
+        React.createElement('button',
+             {
+               className: `tab-button ${activeTab === 'practice' ? 'active' : ''}`,
+               onClick: () => setActiveTab('practice')
+             },
+             'Practice Sessions'
+           ),
+
+        React.createElement('div', { className: 'tabs-content' }, [
+          activeTab === 'tournaments' && React.createElement(
+            TournamentManagement,
+            { token: auth.token, onTournamentAdded: handleTournamentAdded, key: "tab-tournaments" }
+          ),
+
+          activeTab === 'calendar' && React.createElement(
+            TournamentCalendar,
+            { token: auth.token, refreshTrigger: tournamentRefresh, key: "tab-calendar" }
+          ),
+
+          activeTab === 'bracket' && React.createElement(
+            TournamentBracket,
+            {
+              token: auth.token,
+              key: "tab-bracket",
+              onOpenLiveScoring: () => setActiveTab('live-scoring')
+            }
+          ),
+
+          activeTab === 'live-scoring' && React.createElement(
+            LiveScoring,
+            { key: "tab-live-scoring" }
+          ),
+
+           activeTab === 'inventory' && React.createElement(
+             InventoryPage,
+             { isAdmin: true, userId: auth.user?.id, key: "tab-inventory" }
+           ),
+
+           activeTab === 'practice' && React.createElement(
+             PracticeSessionManagement,
+             { token: auth.token, key: "tab-practice" }
+           ),
+
+          activeTab === 'approvals' && React.createElement('div', { className: 'approvals-tab', key: "tab-approvals" },
+            React.createElement('h2', null, 'Pending Registration Requests'),
+
+            error && React.createElement('div', { className: 'error-message' }, error),
+            successMessage && React.createElement('div', { className: 'success-message' }, successMessage),
+
+            loading
+              ? React.createElement('div', { className: 'loading' }, 'Loading...')
+              : pendingRequests.length === 0
+                ? React.createElement('div', { className: 'no-requests' },
+                  React.createElement('p', null, 'No pending registration requests')
                 )
-              ),
-              React.createElement('tbody', null,
-                pendingRequests.map(req =>
-                  React.createElement('tr', { key: req.id },
-                    React.createElement('td', null, req.username),
-                    React.createElement('td', null, req.identityNumber),
-                    React.createElement('td', null, req.email),
-                    React.createElement('td', null,
-                      new Date(req.createdAt).toLocaleDateString()
+                : React.createElement('div', { className: 'requests-table' },
+                  React.createElement('table', null,
+                    React.createElement('thead', null,
+                      React.createElement('tr', null,
+                        React.createElement('th', null, 'Username'),
+                        React.createElement('th', null, 'Identity Number'),
+                        React.createElement('th', null, 'Email'),
+                        React.createElement('th', null, 'Requested Date'),
+                        React.createElement('th', null, 'Actions')
+                      )
                     ),
+                    React.createElement('tbody', null,
+                      pendingRequests.map(req =>
+                        React.createElement('tr', { key: req.id },
+                          React.createElement('td', null, req.username),
+                          React.createElement('td', null, req.identityNumber),
+                          React.createElement('td', null, req.email),
+                          React.createElement('td', null,
+                            new Date(req.createdAt).toLocaleDateString()
+                          ),
 
-                    React.createElement('td', null,
-                      React.createElement('div', { className: 'actions-cell' },
-                        React.createElement('button',
-                          { 
-                            className: 'approve-btn',
-                            onClick: () => approve(req.id, req.username) 
-                          },
-                          'Approve'
-                        ),
+                          React.createElement('td', null,
+                            React.createElement('div', { className: 'actions-cell' },
+                              React.createElement('button',
+                                { 
+                                  className: 'approve-btn',
+                                  onClick: () => approve(req.id, req.username) 
+                                },
+                                'Approve'
+                              ),
 
-                        React.createElement('button',
-                          { 
-                            className: 'reject-btn',
-                            onClick: () => reject(req.id, req.username) 
-                          },
-                          'Reject'
+                              React.createElement('button',
+                                { 
+                                  className: 'reject-btn',
+                                  onClick: () => reject(req.id, req.username) 
+                                },
+                                'Reject'
+                              )
+                            )
+                          )
                         )
                       )
                     )
                   )
                 )
-              )
-            )
           )
+        ])
+      )
     )
   );
 }

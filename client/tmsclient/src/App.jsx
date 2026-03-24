@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
@@ -6,6 +7,9 @@ import Dashboard from './pages/PlayerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './pages/ProtectedRoute';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import LiveScoring from './pages/LiveScoring';
+import LiveScoreView from './pages/LiveScoreView';
+import InventoryPage from './pages/InventoryPage';
 import './App.css';
 
 function isAdminRole(role) {
@@ -57,8 +61,28 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+        <Route
+          path="/admin/live-scoring/:urlTournamentId?/:urlMatchId?"
+          element={
+            <ProtectedRoute roles={["Admin","SystemAdmin"]}>
+              <LiveScoring />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/live-score/:tournamentId/:matchId"
+          element={<LiveScoreView />}
+        />
       {/* 2. Updated fallback to catch bad URLs and send them home */}
       <Route path="*" element={<Navigate to="/" />} />
+      <Route
+        path="/inventory"
+        element={
+          <ProtectedRoute roles={["Player","Admin","SystemAdmin"]}>
+            <InventoryPage isAdmin={isAdminRole(user?.role)} userId={user?.id} />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }

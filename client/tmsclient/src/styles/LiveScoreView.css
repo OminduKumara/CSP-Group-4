@@ -1,0 +1,118 @@
+.live-score-view {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.live-score-header h2 {
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.live-score-header h3 {
+  color: #7f8c8d;
+  font-weight: 500;
+  margin-bottom: 2rem;
+}
+
+.scoreboard {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.team-score {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.team-score h4 {
+  font-size: 1.5rem;
+  color: #34495e;
+  margin-bottom: 1rem;
+}
+
+.points {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #2c3e50;
+  background: white;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.vs {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #95a5a6;
+  padding: 0 2rem;
+}
+
+.serving-indicator {
+  margin-top: 1rem;
+  color: #27ae60;
+  font-weight: 600;
+}
+
+.set-scores {
+  margin-bottom: 2rem;
+}
+
+.sets-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.sets-table th, .sets-table td {
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  text-align: center;
+}
+
+.sets-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+}
+
+.btn-back {
+  padding: 0.75rem 1.5rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-back:hover {
+  background: #2980b9;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+}
+
+.error {
+  color: #e74c3c;
+}
