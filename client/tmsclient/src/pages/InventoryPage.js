@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_BASE_URL from "../config/api";
 import { useAuth } from "../contexts/AuthContext";
 import "../styles/InventoryPage.css";
 
@@ -61,21 +62,21 @@ const InventoryPage = ({ isAdmin, userId }) => {
   }, []);
 
   const fetchInventory = async () => {
-    const res = await axios.get("/api/inventory", {
+    const res = await axios.get(`${API_BASE_URL}/inventory`, {
       headers: { Authorization: `Bearer ${auth.token}` }
     });
     setInventory(Array.isArray(res.data) ? res.data : []);
   };
 
   const fetchTransactions = async () => {
-    const res = await axios.get("/api/inventory/transactions", {
+    const res = await axios.get(`${API_BASE_URL}/inventory/transactions`, {
       headers: { Authorization: `Bearer ${auth.token}` }
     });
     setTransactions(Array.isArray(res.data) ? res.data : []);
   };
 
   const fetchReturnedLogs = async () => {
-    const res = await axios.get("/api/inventory/returned-transactions", {
+    const res = await axios.get(`${API_BASE_URL}/inventory/returned-transactions`, {
       headers: { Authorization: `Bearer ${auth.token}` }
     });
     setReturnedLogs(Array.isArray(res.data) ? res.data : []);
@@ -88,11 +89,11 @@ const InventoryPage = ({ isAdmin, userId }) => {
     try {
       let res;
       if (/^\d+$/.test(userIdOrUsername)) {
-        res = await axios.get(`/api/inventory/user/${userIdOrUsername}`, {
+        res = await axios.get(`${API_BASE_URL}/inventory/user/${userIdOrUsername}`, {
           headers: { Authorization: `Bearer ${auth.token}` }
         });
       } else {
-        res = await axios.get(`/api/inventory/user-by-username/${userIdOrUsername}`, {
+        res = await axios.get(`${API_BASE_URL}/inventory/user-by-username/${userIdOrUsername}`, {
           headers: { Authorization: `Bearer ${auth.token}` }
         });
       }
@@ -104,7 +105,7 @@ const InventoryPage = ({ isAdmin, userId }) => {
   };
 
   const handleAddItem = async () => {
-    await axios.post("/api/inventory/add", {
+    await axios.post(`${API_BASE_URL}/inventory/add`, {
       name: itemName,
       quantity: itemQty,
       category: itemCategory,
@@ -122,7 +123,7 @@ const InventoryPage = ({ isAdmin, userId }) => {
 
   const handleUpdateCondition = async () => {
     try {
-      await axios.put(`/api/inventory/condition/${selectedItem.id}`, {
+      await axios.put(`${API_BASE_URL}/inventory/condition/${selectedItem.id}`, {
         condition: editingCondition
       }, {
         headers: { Authorization: `Bearer ${auth.token}` }
@@ -136,7 +137,7 @@ const InventoryPage = ({ isAdmin, userId }) => {
 
   const saveInlineCondition = async (id) => {
     try {
-      await axios.put(`/api/inventory/condition/${id}`, {
+      await axios.put(`${API_BASE_URL}/inventory/condition/${id}`, {
         condition: inlineCondition
       }, {
         headers: { Authorization: `Bearer ${auth.token}` }
@@ -153,7 +154,7 @@ const InventoryPage = ({ isAdmin, userId }) => {
   };
 
   const handleDeleteItem = async (itemId) => {
-    await axios.delete(`/api/inventory/delete/${itemId}`, {
+    await axios.delete(`${API_BASE_URL}/inventory/delete/${itemId}`, {
       headers: { Authorization: `Bearer ${auth.token}` }
     });
     if (selectedItem?.id === itemId) setSelectedItem(null);
@@ -161,7 +162,7 @@ const InventoryPage = ({ isAdmin, userId }) => {
   };
 
   const handleReturnTransaction = async (txId) => {
-    await axios.post(`/api/inventory/return/${txId}`, {}, {
+    await axios.post(`${API_BASE_URL}/inventory/return/${txId}`, {}, {
       headers: { Authorization: `Bearer ${auth.token}` }
     });
     fetchTransactions();
@@ -197,7 +198,7 @@ const InventoryPage = ({ isAdmin, userId }) => {
       return;
     }
     try {
-      await axios.post("/api/inventory/issue", {
+      await axios.post(`${API_BASE_URL}/inventory/issue`, {
         inventoryItemId: selectedItem.id,
         issuedToUserId,
         quantity: issueQty,
@@ -327,7 +328,7 @@ const InventoryPage = ({ isAdmin, userId }) => {
               <input className="inv-input" value={issueComment} onChange={e => setIssueComment(e.target.value)} placeholder="Request Details" />
               <button className="inv-btn-primary" onClick={async () => {
                 let userObj = await fetchUser(userId);
-                await axios.post("/api/inventory/request", {
+                await axios.post(`${API_BASE_URL}/inventory/request`, {
                   inventoryItemId: selectedItem.id,
                   requestedByUserId: userObj?.id || userId,
                   quantity: issueQty,
