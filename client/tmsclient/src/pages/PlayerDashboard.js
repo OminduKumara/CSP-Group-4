@@ -58,9 +58,9 @@ export default function Dashboard() {
           React.createElement('h3', null, 'Matches'),
           React.createElement('p', null, 'Manage matches')
         ),
-        React.createElement('div', { className: 'dashboard-card' },
+        React.createElement('div', { className: 'dashboard-card', onClick: () => navigate('/profile') },
           React.createElement('h3', null, 'Players'),
-          React.createElement('p', null, 'Player profile')
+          React.createElement('p', null, 'Personal profile')
         ),
         React.createElement('div', { className: 'dashboard-card', onClick: () => navigate('/inventory') },
           React.createElement('h3', null, 'Inventory'),

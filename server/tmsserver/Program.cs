@@ -317,6 +317,16 @@ static async Task InitializeDatabaseAsync(string connectionString)
                             CONSTRAINT FK_InventoryTransaction_PerformedByAdmin FOREIGN KEY (PerformedByAdminId) REFERENCES dbo.Users(Id)
                         );
                     END
+                    
+                    IF COL_LENGTH('dbo.Users', 'ContactNumber') IS NULL
+                    BEGIN
+                        ALTER TABLE dbo.Users ADD ContactNumber NVARCHAR(30) NULL;
+                    END;
+
+                    IF COL_LENGTH('dbo.Users', 'Address') IS NULL
+                    BEGIN
+                        ALTER TABLE dbo.Users ADD Address NVARCHAR(255) NULL;
+                    END;
                 ";
                 await command.ExecuteNonQueryAsync();
             }

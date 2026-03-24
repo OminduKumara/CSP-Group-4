@@ -156,6 +156,10 @@
   background: #f9fafb;
 }
 
+.requests-table tbody tr.selected-row {
+  background: #eef6ff;
+}
+
 .actions-cell {
   display: flex;
   gap: 8px;
@@ -374,4 +378,50 @@
   border-radius: 4px;
   margin-top: 16px;
   color: #7f8c8d;
+}
+
+.players-management-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.player-details-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  background: #fafafa;
+}
+
+.player-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.player-form-grid input,
+.player-form-grid textarea,
+.player-form-grid select {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.readonly-meta {
+  font-size: 13px;
+  color: #4b5563;
+}
+
+@media (max-width: 1024px) {
+  .players-management-grid {
+    grid-template-columns: 1fr;
+  }
 }
