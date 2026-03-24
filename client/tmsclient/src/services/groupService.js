@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:5011/api';
+import API_BASE_URL from '../config/api';
 
 const groupService = {
   // Get all groups with players for a tournament
