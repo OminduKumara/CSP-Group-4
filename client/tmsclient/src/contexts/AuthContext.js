@@ -53,6 +53,8 @@ export function AuthProvider(props) {
         username: data.username,
         email: data.email,
         identityNumber: data.identityNumber,
+        contactNumber: data.contactNumber || '',
+        address: data.address || '',
         role: data.role,
         isApproved: data.isApproved,
         approvedAt: data.approvedAt
@@ -118,9 +120,18 @@ export function AuthProvider(props) {
 
   const isAuthenticated = !!token && !!user;
 
+  const updateUser = useCallback(function (partialUser) {
+    setUser(function (prevUser) {
+      if (!prevUser) return prevUser;
+      const nextUser = { ...prevUser, ...partialUser };
+      localStorage.setItem('user', JSON.stringify(nextUser));
+      return nextUser;
+    });
+  }, []);
+
   return React.createElement(
     AuthContext.Provider,
-    { value: { user, token, loading, error, isAuthenticated, login, signup, logout } },
+    { value: { user, token, loading, error, isAuthenticated, login, signup, logout, updateUser } },
     children
   );
 }

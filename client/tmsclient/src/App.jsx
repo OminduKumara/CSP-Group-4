@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LiveScoring from './pages/LiveScoring';
 import LiveScoreView from './pages/LiveScoreView';
 import InventoryPage from './pages/InventoryPage';
+import PlayerProfile from './pages/PlayerProfile';
 import './App.css';
 
 function isAdminRole(role) {
@@ -50,6 +51,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute roles={["Player"]} redirectTo="/admin">
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute roles={["Player"]} redirectTo="/admin">
+            <PlayerProfile />
           </ProtectedRoute>
         }
       />
