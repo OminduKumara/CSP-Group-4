@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_BASE_URL from '../config/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import '../styles/LandingPage.css';
@@ -12,7 +13,7 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchSessions = async () => {
       try {
-        const response = await fetch('http://localhost:5011/api/practicesessions');
+        const response = await fetch(`${API_BASE_URL}/practicesessions`);
         
         if (!response.ok) {
           throw new Error("Database blocked or backend unavailable");

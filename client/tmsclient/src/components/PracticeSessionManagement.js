@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import API_BASE_URL from '../config/api';
 export default function PracticeSessionManagement({ token }) {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,7 +15,7 @@ export default function PracticeSessionManagement({ token }) {
     sessionType: 'Team Practice'
   });
 
-  const API_URL = 'http://localhost:5011/api/practicesessions';
+  const API_URL = `${API_BASE_URL}/practicesessions`;
 
   useEffect(() => {
     fetchSessions();
