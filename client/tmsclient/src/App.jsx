@@ -11,6 +11,7 @@ import LiveScoring from './pages/LiveScoring';
 import LiveScoreView from './pages/LiveScoreView';
 import InventoryPage from './pages/InventoryPage';
 import PlayerProfile from './pages/PlayerProfile';
+import PlayerAttendance from './pages/PlayerAttendance';
 import './App.css';
 
 function isAdminRole(role) {
@@ -59,6 +60,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute roles={["Player"]} redirectTo="/admin">
             <PlayerProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my-attendance"
+        element={
+          <ProtectedRoute roles={["Player"]} redirectTo="/admin">
+            <PlayerAttendance />
           </ProtectedRoute>
         }
       />
