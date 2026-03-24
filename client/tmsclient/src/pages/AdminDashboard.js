@@ -7,6 +7,7 @@ import TournamentBracket from '../components/TournamentBracket';
 import LiveScoring from './LiveScoring';
 import InventoryPage from './InventoryPage';
 import PracticeSessionManagement from '../components/PracticeSessionManagement';
+import AdminAttendanceManagement from '../components/AdminAttendanceManagement';
 
 import { API_ENDPOINTS } from '../config/api';
 import '../styles/AdminDashboard.css';
@@ -353,6 +354,13 @@ export default function AdminDashboard() {
            ),
            React.createElement('button',
              {
+               className: `tab-button ${activeTab === 'attendance' ? 'active' : ''}`,
+               onClick: () => setActiveTab('attendance')
+             },
+             'Attendance'
+           ),
+           React.createElement('button',
+             {
                className: `tab-button ${activeTab === 'players' ? 'active' : ''}`,
                onClick: () => {
                  setActiveTab('players');
@@ -404,6 +412,11 @@ export default function AdminDashboard() {
              PracticeSessionManagement,
              { token: auth.token, key: "tab-practice" }
            ),
+
+          activeTab === 'attendance' && React.createElement(
+            AdminAttendanceManagement,
+            { token: auth.token, key: 'tab-attendance' }
+          ),
 
           activeTab === 'players' && React.createElement('div', { className: 'approvals-tab', key: 'tab-players' },
             React.createElement('h2', null, 'Registered Players'),
