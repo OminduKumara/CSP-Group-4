@@ -46,9 +46,9 @@ export default function Dashboard() {
       React.createElement('h2', null, 'Dashboard'),
       React.createElement('p', null, 'Welcome to the Tennis Management System!'),
       React.createElement('div', { className: 'dashboard-grid' },
-        React.createElement('div', { className: 'dashboard-card' },
+        React.createElement('div', { className: 'dashboard-card', onClick: () => navigate('/my-attendance') },
           React.createElement('h3', null, 'Practice'),
-          React.createElement('p', null, 'Practice schedule')
+          React.createElement('p', null, 'My attendance records')
         ),
         React.createElement('div', { className: 'dashboard-card' },
           React.createElement('h3', null, 'Tournaments'),
