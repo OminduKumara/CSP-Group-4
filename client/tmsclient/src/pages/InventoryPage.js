@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import API_BASE_URL from "../config/api";
 import { useAuth } from "../contexts/AuthContext";
+import InventoryReport from "../components/InventoryReport";
 import "../styles/InventoryPage.css";
 
 function TransactionItem({ tx, fetchUser, onReturn, onApprove, showReturn = true, isAdmin = false }) {
@@ -54,6 +55,7 @@ const InventoryPage = ({ isAdmin, userId }) => {
   const [userCache, setUserCache] = useState({});
   const [returnedLogs, setReturnedLogs] = useState([]);
   const [issueError, setIssueError] = useState("");
+  const [showReport, setShowReport] = useState(false);
 
   useEffect(() => {
     fetchInventory();
@@ -221,15 +223,20 @@ const InventoryPage = ({ isAdmin, userId }) => {
     <div className="inventory-dashboard">
       <div className="inventory-header">
         <h2>Inventory Management</h2>
-        {isAdmin && (
-          <div className="add-item-bar">
-            <input className="inv-input" value={itemName} onChange={e => setItemName(e.target.value)} placeholder="Item Name" />
-            <input className="inv-input" type="number" style={{width: '80px'}} value={itemQty} onChange={e => setItemQty(Number(e.target.value))} min={1} />
-            <input className="inv-input" value={itemCategory} onChange={e => setItemCategory(e.target.value)} placeholder="Category" />
-            <input className="inv-input" value={itemCondition} onChange={e => setItemCondition(e.target.value)} placeholder="Condition (Cracked, Good)" />
-            <button className="inv-btn-primary" onClick={handleAddItem}>Add Item</button>
-          </div>
-        )}
+        <div className="inventory-header-actions">
+          <button className="inv-btn-report" onClick={() => setShowReport(true)}>
+            Generate Report
+          </button>
+          {isAdmin && (
+            <div className="add-item-bar">
+              <input className="inv-input" value={itemName} onChange={e => setItemName(e.target.value)} placeholder="Item Name" />
+              <input className="inv-input" type="number" style={{width: '80px'}} value={itemQty} onChange={e => setItemQty(Number(e.target.value))} min={1} />
+              <input className="inv-input" value={itemCategory} onChange={e => setItemCategory(e.target.value)} placeholder="Category" />
+              <input className="inv-input" value={itemCondition} onChange={e => setItemCondition(e.target.value)} placeholder="Condition (Cracked, Good)" />
+              <button className="inv-btn-primary" onClick={handleAddItem}>Add Item</button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="inv-grid">
@@ -386,6 +393,16 @@ const InventoryPage = ({ isAdmin, userId }) => {
           )}
         </div>
       </div>
+
+      {showReport && (
+        <InventoryReport
+          inventory={inventory}
+          transactions={transactions}
+          returnedLogs={returnedLogs}
+          isAdmin={isAdmin}
+          onClose={() => setShowReport(false)}
+        />
+      )}
     </div>
   );
 }

@@ -277,10 +277,19 @@
   background: #f9fafb;
   padding: 0;
   margin: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* ADD THIS TO HIDE THE SCROLLBAR IN CHROME/SAFARI */
+.tabs-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-button {
-  flex: 1;
+  flex: 0 0 auto; 
   padding: 16px 24px;
   background: none;
   border: none;
