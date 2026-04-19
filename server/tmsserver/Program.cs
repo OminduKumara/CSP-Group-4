@@ -72,7 +72,8 @@ builder.Services.AddScoped<ITournamentTeamRepository, TournamentTeamRepository>(
 builder.Services.AddScoped<ITournamentMatchRepository, TournamentMatchRepository>();
 builder.Services.AddScoped<IMatchScoreRepository, MatchScoreRepository>();
 builder.Services.AddScoped<ILiveGameScoreRepository, LiveGameScoreRepository>();
-builder.Services.AddScoped<PracticeSessionRepository>();
+builder.Services.AddScoped<IPracticeSessionRepository, PracticeSessionRepository>();
+builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
 
 // Add services
 builder.Services.AddScoped<UserService>();
@@ -156,6 +157,8 @@ static void LoadDotEnv()
         }
     }
 }
+
+
 
 static async Task InitializeDatabaseAsync(string connectionString)
 {

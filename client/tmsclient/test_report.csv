@@ -1,0 +1,51 @@
+Test Suite (File),Test Case Name,Status,Duration (ms)
+AdminAttendanceManagement.test.jsx,AdminAttendanceManagement Component renders correctly and shows title,passed,62.19
+AdminDashboard.test.jsx,AdminDashboard Page renders side navigation and default tab,passed,99.5
+AdminDashboard.test.jsx,AdminDashboard Page switches tabs properly,passed,56.2
+App.test.jsx,App Component renders landing page by default,passed,27.53
+AttendanceReport.test.jsx,AttendanceReport Component renders correctly,passed,55.43
+AuthModal.test.jsx,AuthModal Component renders nothing when isOpen is false,passed,13.01
+AuthModal.test.jsx,AuthModal Component renders login form by default when opened,passed,109.5
+AuthModal.test.jsx,AuthModal Component switches to signup tab,passed,36.44
+AuthModal.test.jsx,AuthModal Component calls login context and handles navigation for admin,passed,25.09
+AuthModal.test.jsx,AuthModal Component shows error on login failure,passed,30.88
+AuthModal.test.jsx,AuthModal Component prevents signup when passwords do not match,passed,22.3
+Footer.test.jsx,Footer Component renders copyright text correctly,passed,30.11
+Footer.test.jsx,Footer Component renders all footer links,passed,100.15
+InnerNavbar.test.jsx,InnerNavbar Component renders correctly,passed,84.11
+InventoryPage.test.jsx,InventoryPage renders inventory items,passed,91.64
+InventoryPage.test.jsx,InventoryPage renders active operations panel empty initially,passed,11.6
+InventoryReport.test.jsx,InventoryReport Component renders correctly,passed,61.87
+LandingPage.test.jsx,LandingPage Component renders correctly and shows hero section,passed,163.31
+LandingPage.test.jsx,LandingPage Component loads and displays practice schedule,passed,36.28
+LandingPage.test.jsx,LandingPage Component renders leadership section,passed,31.28
+LiveScoreView.test.jsx,LiveScoreView Page renders live scores and stats successfully,passed,65.32
+LiveScoring.test.jsx,LiveScoring Page renders tournament list successfully,passed,44.24
+Login.test.jsx,Login Page renders login form correctly,passed,117.01
+Login.test.jsx,Login Page navigates to admin dashboard if role is admin,passed,22.82
+Login.test.jsx,Login Page navigates to player dashboard if role is user,passed,12.46
+Login.test.jsx,Login Page displays error message on failed login,passed,18.38
+Navbar.test.jsx,Navbar Component renders logos and text correctly,passed,38.11
+Navbar.test.jsx,Navbar Component opens and closes AuthModal when clicking login button,passed,120.16
+PlayerAttendance.test.jsx,PlayerAttendance Page renders attendance history table,passed,67.28
+PlayerDashboard.test.jsx,PlayerDashboard Page renders loading state initially and then shows stats,passed,127.45
+PlayerDashboard.test.jsx,PlayerDashboard Page handles navigation action clicks,passed,37.96
+PlayerProfile.test.jsx,PlayerProfile Page renders loading state initially and then fetches profile,passed,43.04
+PlayerProfile.test.jsx,PlayerProfile Page shows error on invalid email submit,passed,99.06
+PlayerProfile.test.jsx,PlayerProfile Page submits updated profile data successfully,passed,29.04
+PracticeSessionManagement.test.jsx,PracticeSessionManagement Component renders correctly and loads data,passed,47.66
+ProtectedRoute.test.jsx,ProtectedRoute shows loading state initially,passed,29.17
+ProtectedRoute.test.jsx,ProtectedRoute redirects to login if not authenticated,passed,5.38
+ProtectedRoute.test.jsx,ProtectedRoute renders children if authenticated and no specific roles required,passed,2.75
+ProtectedRoute.test.jsx,ProtectedRoute renders children if authenticated user has required role,passed,2.45
+ProtectedRoute.test.jsx,ProtectedRoute redirects to dashboard (default) if authenticated but missing required role,passed,2.58
+ProtectedRoute.test.jsx,ProtectedRoute redirects to custom path if authenticated but missing required role,passed,2.24
+Signup.test.jsx,Signup Page renders signup form fields,passed,131.02
+Signup.test.jsx,Signup Page shows error if passwords do not match,passed,20.85
+Signup.test.jsx,Signup Page calls signup and navigates to login on success,passed,25.65
+SystemStatus.test.jsx,SystemStatus Component fetches and displays system health statuses,passed,151.19
+SystemStatus.test.jsx,SystemStatus Component handles error state properly,passed,32.12
+TournamentBracket.test.jsx,TournamentBracket Component renders correctly,passed,32.0
+TournamentCalendar.test.jsx,TournamentCalendar Component renders correctly,passed,115.83
+TournamentManagement.test.jsx,TournamentManagement Component renders correctly,passed,41.97
+TournamentSummaryReport.test.jsx,TournamentSummaryReport Component renders correctly,passed,70.23

@@ -10,6 +10,12 @@ import tennisLogo from '../assets/tennis-logo.png';
 export default function InnerNavbar({ title, username, onLogout, backTo = '/dashboard' }) {
   const navigate = useNavigate();
 
+  const handleConfirmedLogout = () => {
+    const shouldLogout = window.confirm('Are you sure you want to log out?');
+    if (!shouldLogout) return;
+    onLogout?.();
+  };
+
   return (
     <nav style={{
       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -43,7 +49,7 @@ export default function InnerNavbar({ title, username, onLogout, backTo = '/dash
           <span style={{ marginRight: '4px' }}>←</span> Back
         </button>
         {onLogout && (
-          <button onClick={onLogout} style={{
+          <button onClick={handleConfirmedLogout} style={{
             background: '#FF5C00', color: '#fff', border: 'none', borderRadius: '50px',
             padding: '0.45rem 1.2rem', fontWeight: 600, fontSize: '0.82rem', cursor: 'pointer',
             fontFamily: "'Montserrat', sans-serif", boxShadow: '0 2px 10px rgba(255,92,0,0.25)',

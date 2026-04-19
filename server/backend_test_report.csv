@@ -1,0 +1,13 @@
+Test ID,Test Case Name,Controller,Endpoint,HTTP Method,Description,Result
+TC001,GetUsers_ReturnsOk,AdminController,/api/admin/users,GET,Verifies admin can list all system users,Passed
+TC002,GetUser_WithValidId_ReturnsOk,AdminController,/api/admin/users/{id},GET,Verifies admin can fetch a specific user profile,Passed
+TC003,CheckHealth_ReturnsResponse,HealthController,/api/health,GET,Verifies the system health endpoint responds correctly,Passed
+TC004,GetAllSessions_ReturnsOk,PracticeSessionsController,/api/practicesessions,GET,Verifies retrieval of all scheduled practice sessions,Passed
+TC005,GetAll_ReturnsOk,TournamentsController,/api/tournaments,GET,Verifies retrieval of all active tournaments,Passed
+TC006,GetTeams_ReturnsOk,BracketController,/api/tournaments/{id}/bracket/teams,GET,Verifies retrieval of teams for a specific tournament bracket,Passed
+TC007,GetGroups_ReturnsOk,GroupController,/api/group/tournament/{id},GET,Verifies retrieval of group/player mappings for a tournament,Passed
+TC008,GetInventory_ReturnsOk,InventoryController,/api/inventory,GET,Verifies retrieval of all inventory items from the database,Passed
+TC009,GetPlayers_ReturnsOk,PlayerController,/api/player,GET,Verifies basic accessibility of player-related management endpoints,Passed
+TC010,Login_WithValidCredentials_ReturnsOk,AuthController,/api/auth/login,POST,Verifies user login with SHA256 password validation and token generation,Passed
+TC011,Signup_WithValidData_ReturnsOk,AuthController,/api/auth/signup,POST,Verifies new user registration with sliit.lk domain and identity validation,Passed
+TC012,GetPendingRegistrations_AsAdmin_ReturnsOk,AuthController,/api/auth/pending-registrations,GET,Verifies admin can retrieve player registration requests awaiting approval,Passed
