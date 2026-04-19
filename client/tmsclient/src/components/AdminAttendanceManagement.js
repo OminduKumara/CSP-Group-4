@@ -146,66 +146,77 @@ export default function AdminAttendanceManagement({ token }) {
 
   return (
     <div className="approvals-tab">
-      <h2>Attendance Management</h2>
+      <h2>Attendance Central</h2>
       {error && <div className="error-message">{error}</div>}
       {success && <div className="success-message">{success}</div>}
 
-      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '16px' }}>
-        <select
-          value={selectedSessionId}
-          onChange={(e) => setSelectedSessionId(e.target.value)}
-          style={{ padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
-        >
-          <option value="">Select Practice Session</option>
-          {sessions.map((session) => (
-            <option key={session.id} value={session.id}>
-              {session.dayOfWeek} | {session.startTime} - {session.endTime} | {session.sessionType}
-            </option>
-          ))}
-        </select>
+      <div className="admin-card" style={{ marginBottom: '24px' }}>
+        <h3 style={{ marginTop: 0, marginBottom: '20px', fontSize: '1.1rem' }}>Session Selection</h3>
+        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          <div className="form-group-item" style={{ flex: 1, minWidth: '300px' }}>
+            <label>Practice Session</label>
+            <select
+              value={selectedSessionId}
+              onChange={(e) => setSelectedSessionId(e.target.value)}
+            >
+              <option value="">Select Practice Session</option>
+              {sessions.map((session) => (
+                <option key={session.id} value={session.id}>
+                  {session.dayOfWeek} | {session.startTime} - {session.endTime} | {session.sessionType}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          style={{ padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
-        />
+          <div className="form-group-item">
+            <label>Attendance Date</label>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+            />
+          </div>
 
-        <button className="approve-btn" onClick={() => loadAttendanceGrid()}>
-          Load Attendance
-        </button>
+          <button className="btn-primary" onClick={() => loadAttendanceGrid()} style={{ height: '42px', padding: '0 30px' }}>
+            Load Records
+          </button>
+        </div>
+
+        {selectedSession ? (
+          <div style={{ marginTop: '20px', padding: '12px 16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+             <span className="status-badge status-inprogress" style={{ margin: 0 }}>Active</span>
+             <span style={{ fontSize: '14px', fontWeight: 700, color: '#000040' }}>
+               {selectedSession.dayOfWeek} ({selectedSession.startTime} - {selectedSession.endTime}) — {selectedSession.sessionType}
+             </span>
+          </div>
+        ) : null}
       </div>
 
-      {selectedSession ? (
-        <p style={{ marginTop: 0, color: '#4b5563' }}>
-          Editing session: <strong>{selectedSession.dayOfWeek}</strong> ({selectedSession.startTime} - {selectedSession.endTime}) - {selectedSession.sessionType}
-        </p>
-      ) : null}
-
       {loading ? (
-        <div className="loading">Loading attendance...</div>
+        <div className="loading">Retrieving Attendance Data...</div>
       ) : attendanceRows.length > 0 ? (
         <div className="requests-table" style={{ marginBottom: '20px' }}>
           <table>
             <thead>
               <tr>
-                <th>Player</th>
-                <th>Email</th>
-                <th>Identity Number</th>
-                <th>Present</th>
+                <th>Athlete Name</th>
+                <th>Contact / Email</th>
+                <th>Identity #</th>
+                <th style={{ textAlign: 'center' }}>Mark Attendance</th>
               </tr>
             </thead>
             <tbody>
               {attendanceRows.map((row) => (
                 <tr key={row.playerId}>
-                  <td>{row.playerName}</td>
+                  <td><strong>{row.playerName}</strong></td>
                   <td>{row.playerEmail}</td>
-                  <td>{row.playerIdentityNumber}</td>
-                  <td>
+                  <td><code>{row.playerIdentityNumber}</code></td>
+                  <td style={{ textAlign: 'center' }}>
                     <input
                       type="checkbox"
                       checked={!!row.isPresent}
                       onChange={() => toggleAttendance(row.playerId)}
+                      style={{ transform: 'scale(1.4)', cursor: 'pointer' }}
                     />
                   </td>
                 </tr>
@@ -214,42 +225,51 @@ export default function AdminAttendanceManagement({ token }) {
           </table>
         </div>
       ) : (
-        <div className="no-requests">
-          <p>Select a session/date and click "Load Attendance".</p>
+        <div className="no-data">
+          <p>Please select a practice session and date above to load the attendance register.</p>
         </div>
       )}
 
-      <div style={{ marginBottom: '28px' }}>
-        <button className="approve-btn" onClick={handleSaveAttendance} disabled={saving || attendanceRows.length === 0}>
-          {saving ? 'Saving...' : 'Save Attendance'}
+      <div style={{ marginBottom: '40px', display: 'flex', justifyContent: 'flex-end' }}>
+        <button 
+          className="btn-primary" 
+          onClick={handleSaveAttendance} 
+          disabled={saving || attendanceRows.length === 0}
+          style={{ padding: '12px 40px' }}
+        >
+          {saving ? 'Synchronizing...' : 'Commit Attendance Changes'}
         </button>
       </div>
 
-      <h2>Admin Report - Frequent Absentees</h2>
+      <h2 style={{ marginBottom: '20px' }}>Absence Analytics</h2>
       <div className="requests-table">
         <table>
           <thead>
             <tr>
-              <th>Player</th>
-              <th>Email</th>
-              <th>Missed Sessions</th>
-              <th>Total Marked Sessions</th>
-              <th>Miss %</th>
+              <th>Athlete</th>
+              <th>Contact</th>
+              <th style={{ textAlign: 'center' }}>Missed</th>
+              <th style={{ textAlign: 'center' }}>Total</th>
+              <th style={{ textAlign: 'center' }}>Absence %</th>
             </tr>
           </thead>
           <tbody>
             {reportRows.map((row) => (
               <tr key={row.playerId}>
-                <td>{row.username}</td>
+                <td><strong>{row.username}</strong></td>
                 <td>{row.email}</td>
-                <td>{row.missedSessions}</td>
-                <td>{row.totalMarkedSessions}</td>
-                <td>{row.missPercentage}%</td>
+                <td style={{ textAlign: 'center', color: '#ef4444', fontWeight: 700 }}>{row.missedSessions}</td>
+                <td style={{ textAlign: 'center', fontWeight: 600 }}>{row.totalMarkedSessions}</td>
+                <td style={{ textAlign: 'center' }}>
+                  <span className={`status-badge ${row.missPercentage > 30 ? 'status-cancelled' : 'status-inprogress'}`}>
+                    {row.missPercentage}%
+                  </span>
+                </td>
               </tr>
             ))}
             {reportRows.length === 0 ? (
               <tr>
-                <td colSpan="5" style={{ textAlign: 'center' }}>No absentee data yet.</td>
+                <td colSpan="5" style={{ textAlign: 'center', opacity: 0.5 }}>No attendance trends found for the current period.</td>
               </tr>
             ) : null}
           </tbody>

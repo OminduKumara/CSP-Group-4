@@ -70,80 +70,75 @@ const AttendanceReport = () => {
     };
 
     return (
-        // Uses your team's standard tab wrapper
         <div className="approvals-tab">
-            <h2>Player Attendance Report</h2>
+            <h2>Player Attendance Analytics</h2>
             
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '24px', alignItems: 'flex-end' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Start Date</label>
-                    <input 
-                        type="date" 
-                        value={startDate} 
-                        onChange={(e) => setStartDate(e.target.value)}
-                        style={{ padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px', outline: 'none' }}
-                    />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>End Date</label>
-                    <input 
-                        type="date" 
-                        value={endDate} 
-                        onChange={(e) => setEndDate(e.target.value)}
-                        style={{ padding: '10px 14px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px', outline: 'none' }}
-                    />
-                </div>
+            <div className="admin-card" style={{ marginBottom: '28px' }}>
+                <h3 style={{ marginTop: 0, marginBottom: '20px', fontSize: '1.1rem' }}>Report Parameters</h3>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'flex-end' }}>
+                    <div className="form-group-item" style={{ minWidth: '200px' }}>
+                        <label>Start Period</label>
+                        <input 
+                            type="date" 
+                            value={startDate} 
+                            onChange={(e) => setStartDate(e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group-item" style={{ minWidth: '200px' }}>
+                        <label>End Period</label>
+                        <input 
+                            type="date" 
+                            value={endDate} 
+                            onChange={(e) => setEndDate(e.target.value)}
+                        />
+                    </div>
 
-                <div style={{ display: 'flex', gap: '12px' }}>
-                    {/* Reusing the team's green approve-btn class for standard styling */}
-                    <button 
-                        onClick={handleGenerateReport}
-                        className="approve-btn"
-                        style={{ padding: '10px 20px', fontSize: '14px' }}
-                        disabled={loading}
-                    >
-                        {loading ? 'Generating...' : 'Generate Report'}
-                    </button>
-                    
-                    {reportData.length > 0 && (
+                    <div style={{ display: 'flex', gap: '12px' }}>
                         <button 
-                            onClick={handleExportPDF}
-                            className="approve-btn"
-                            style={{ padding: '10px 20px', fontSize: '14px', background: '#3b82f6' }} // Custom blue override for export
+                            onClick={handleGenerateReport}
+                            className="btn-primary"
+                            style={{ padding: '0 30px', height: '42px' }}
+                            disabled={loading}
                         >
-                            Export to PDF
+                            {loading ? 'Analyzing...' : 'Generate Analytics'}
                         </button>
-                    )}
+                        
+                        {reportData.length > 0 && (
+                            <button 
+                                onClick={handleExportPDF}
+                                className="btn-secondary"
+                                style={{ padding: '0 30px', height: '42px' }}
+                            >
+                                Export PDF
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
 
             {error && <div className="error-message">{error}</div>}
 
             {reportData.length > 0 ? (
-                // Uses the team's rounded table styling
                 <div className="requests-table">
                     <table>
                         <thead>
                             <tr>
-                                <th>Player Name</th>
+                                <th>Athlete Name</th>
                                 <th>Identity Number</th>
-                                <th>Sessions Scheduled</th>
-                                <th>Sessions Attended</th>
-                                <th>Attendance %</th>
+                                <th style={{ textAlign: 'center' }}>Scheduled</th>
+                                <th style={{ textAlign: 'center' }}>Attended</th>
+                                <th style={{ textAlign: 'center' }}>Compliance %</th>
                             </tr>
                         </thead>
                         <tbody>
                             {reportData.map((player) => (
                                 <tr key={player.playerId}>
-                                    <td>{player.playerName}</td>
-                                    <td>{player.identityNumber}</td>
-                                    <td>{player.totalSessionsScheduled}</td>
-                                    <td>{player.sessionsAttended}</td>
-                                    <td>
-                                        <span style={{ 
-                                            fontWeight: '600', 
-                                            color: player.attendancePercentage < 50 ? '#ef4444' : '#10b981' 
-                                        }}>
+                                    <td><strong>{player.playerName}</strong></td>
+                                    <td><code>{player.identityNumber}</code></td>
+                                    <td style={{ textAlign: 'center' }}>{player.totalSessionsScheduled}</td>
+                                    <td style={{ textAlign: 'center' }}>{player.sessionsAttended}</td>
+                                    <td style={{ textAlign: 'center' }}>
+                                        <span className={`status-badge ${player.attendancePercentage < 70 ? 'status-cancelled' : 'status-inprogress'}`}>
                                             {player.attendancePercentage}%
                                         </span>
                                     </td>
@@ -154,8 +149,8 @@ const AttendanceReport = () => {
                 </div>
             ) : (
                 !loading && (
-                    <div className="no-requests">
-                        <p>Select dates and generate a report to view data.</p>
+                    <div className="no-data">
+                        <p>Define a date range and generate a report to view athlete compliance trends.</p>
                     </div>
                 )
             )}

@@ -14,13 +14,13 @@
 
 This project strictly adheres to the SE3022 Technical Implementation requirements
 
-**Frontend:** React.js\
-**Backend:** ASP.NET Core Web API\
+**Frontend:** React.js (Vite)\
+**Backend:** ASP.NET Core Web API (.NET 10.0)\
 **Database Access:** ADO.NET (Direct SQL, No ORMs)\
-**Database:** MySQL\
+**Database:** Azure SQL / Microsoft SQL Server\
 **CI/CD & Version Control:** GitHub Actions, Git\
-**Deployment:** Docker / Azure App Service\
-**Testing:** Selenium (E2E), JMeter (Load), NUnit/xUnit (Unit)
+**Deployment:** Vercel (Frontend) / Azure App Service (Backend)\
+**Testing:** Postman (Integration), k6 (Load), NUnit/xUnit (Unit)
 
 ---
 
@@ -31,7 +31,7 @@ The system is divided into four primary domains, featuring Role-Based Access Con
 1.  **Player & Attendance Management:** Track weekly practice sessions, log player attendance, and generate fitness reports.
 2.  **Tournament & Live Scoring:** Create tournament brackets, update live match scores, and generate automated leaderboards.
 3.  **Equipment & Inventory Control:** Manage communal club gear, track equipment condition, and calculate financial loss for damaged items.
-4.  **System Administration & QA Dashboard:** Manage user accounts, assign roles, and view live CI/CD and code coverage metrics.
+4.  **System Administration & QA Dashboard:** Manage user accounts, assign roles, and view live CI/CD, system health, and SLA uptime metrics.
 
 ---
 
@@ -40,8 +40,9 @@ The system is divided into four primary domains, featuring Role-Based Access Con
 Ensure you have the following installed on your local machine before setting up the project:
 
 * [Node.js](https://nodejs.org/) (v18+ recommended)
-* [.NET 8.0 SDK](https://dotnet.microsoft.com/download)
-* [MySQL Server](https://dev.mysql.com/downloads/mysql/) (v8.0+)
+* [.NET SDK](https://dotnet.microsoft.com/download)
+* SQL Server Management Studio (SSMS) or Azure Data Studio
+* [k6](https://k6.io/docs/get-started/installation/) (For local load testing)
 * Git
 
 ---
@@ -49,53 +50,67 @@ Ensure you have the following installed on your local machine before setting up 
 ## Local Setup Instructions
 
 ### 1. Database Configuration
-1. Open MySQL Workbench or your preferred database client.
-2. Execute the database creation script located at `/database/schema.sql` to generate the tables.
-3. (Optional) Execute `/database/seed_data.sql` to populate the database with mock users and equipment for testing.
+1. Open your preferred SQL Server client and connect to your local or Azure database.
+2. The database schema and tables will be automatically initialized by the backend via the `InitializeDatabaseAsync` method in `Program.cs` upon first run.
+3. (Optional) Execute any custom seed scripts via your SQL client to populate mock data.
 
 ### 2. Backend Setup (ASP.NET)
 1. Navigate to the backend directory:
    ```bash
-   cd backend
+   cd server/tmsserver
+   ```
+   
 2. Restore the .NET dependencies:
-   `dotnet restore`
-3. Update the database connection string. Open appsettings.json (or appsettings.Development.json) and configure your MySQL credentials:
-   `"ConnectionStrings": {
-  "DefaultConnection": "Server=localhost;Database=SliitTennisDB;User=root;Password=YOUR_PASSWORD;"
-}`
+   ```bash
+   dotnet restore
+   ```
+   
+3. Create a .env file in the server/tmsserver directory and configure your Azure SQL connection string:
+
+AZURE_SQL_CONNECTIONSTRING="Server=tcp:YOUR_SERVER.database.windows.net,1433;Initial Catalog=SliitTennisDB;Persist Security Info=False;User ID=YOUR_USER;Password=YOUR_PASSWORD;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+
 4. Run the API:
-   `dotnet run` 
-The Swagger API documentation will be available at http://localhost:<port>/swagger.
+   ```bash
+   dotnet run
+   ```
+The Swagger API documentation will be available at http://localhost:5011/scalar/v1 or /swagger.
 
 ### 3. Frontend Setup (React.js)
 1. Open a new terminal and navigate to the frontend directory:
-   `cd frontend`
+   ```bash
+   cd client/tmsclient
+   ```
+   
 2. Install the Node modules:
-   `npm install`
-3. Create a .env file in the root of the /frontend directory and define the backend API URL:
-   `REACT_APP_API_URL=http://localhost:<backend-port>/api`
+   ```bash
+   npm install
+   ```
+
+3. Ensure the API endpoints in your src/config/api.js (or .env) point to the running backend (http://localhost:5011/api).
+
 4. Start the React development server:
-   `npm start`
+   ```bash
+   npm run dev
+   ```
 
 ---
 
 ## Testing
+* Automated API Tests (Postman): Import the TMS Automated Tests collection into Postman to validate the core login and profile update user journeys.
 
-**Unit Tests (Backend):** Navigate to the /tests/Backend.Tests directory and run: dotnet test
-
-**End-to-End Tests (Selenium):** Ensure the application is running locally. Navigate to /tests/E2E and execute the test suite to verify UI workflows.
-
-**Load Testing (JMeter):** Open the /tests/LoadTesting/Attendance_Spike.jmx file in the Apache JMeter GUI to simulate concurrent user traffic.
+* Load Testing (k6): Ensure the backend is running locally. Open a new terminal, navigate to the load testing directory, and execute the spike test:
+   ```bash
+   cd server/tmsserver/tests/LoadTests
+   k6 run attendance-test.js
+   ```
 
 ---
 
 ## Git Branching Strategy
-
 To maintain a clean and stable repository, all team members must follow this strict branching workflow:
-
 * main: Production-ready code only. Do not commit directly to this branch.
 * develop: The primary integration branch.
-* feature/<feature-name>: Create these branches off develop for new user stories (e.g., feature/tournament-bracket).
-* testing/<: For fixing issues found during QA.
+* SCRUM-XX / feature: Create branches off develop using the Jira ticket format for new user stories (e.g., SCRUM-68-Production-Deployment).
+* testing: For fixing issues found during QA.
 
-Pull Request Process: All code merged into develop or main requires a Pull Request (PR). GitHub Actions will automatically run the build and unit test steps. The PR must pass all checks and be reviewed by at least one other team member before merging.
+Pull Request Process: All code merged into develop or main requires a Pull Request (PR). GitHub Actions will automatically run the build and integration steps. The PR must pass all checks and be reviewed by at least one other team member before merging. Resolve any bin/obj merge conflicts locally before pushing.

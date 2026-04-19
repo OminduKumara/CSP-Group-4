@@ -1,63 +1,127 @@
+/* ================================================================
+   Player Profile – Unified Theme
+   ================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
 .profile-page-container {
   min-height: 100vh;
-  background: #f7fafc;
+  background: #F5F7FA;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .profile-card {
-  max-width: 640px;
+  max-width: 560px;
   margin: 32px auto;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  padding: 24px;
+  background: #FFFFFF;
+  border-radius: 14px;
+  padding: 32px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 2px 12px rgba(0,0,64,0.04);
 }
 
-.profile-card form {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.profile-card .loading-text {
+  text-align: center;
+  color: #6B7280;
+  font-size: 14px;
 }
 
 .profile-card label {
+  display: block;
+  font-size: 12px;
   font-weight: 600;
-  color: #2d3748;
-  margin-top: 6px;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 16px;
+  margin-bottom: 4px;
 }
 
 .profile-card input,
 .profile-card textarea {
-  border: 1px solid #cbd5e0;
-  border-radius: 6px;
-  padding: 10px;
-  font-size: 14px;
-}
-
-.profile-card input[disabled] {
-  background: #edf2f7;
-  cursor: not-allowed;
-}
-
-.save-btn {
-  margin-top: 12px;
-  background: #2b6cb0;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
+  width: 100%;
   padding: 10px 14px;
-  font-weight: 600;
-  cursor: pointer;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: #1E293B;
+  background: #FAFBFC;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
 }
 
-.save-btn:disabled {
-  opacity: 0.6;
+.profile-card input:focus,
+.profile-card textarea:focus {
+  outline: none;
+  border-color: #000080;
+  box-shadow: 0 0 0 3px rgba(0,0,128,0.06);
+  background: #FFFFFF;
+}
+
+.profile-card input:disabled {
+  background: #F3F4F6;
+  color: #9CA3AF;
   cursor: not-allowed;
 }
 
-.field-error {
-  color: #c53030;
-  font-size: 13px;
+.profile-card .field-error {
+  color: #DC2626;
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 4px;
 }
 
-.loading-text {
-  color: #4a5568;
+.profile-card .save-btn {
+  display: block;
+  width: 100%;
+  margin-top: 24px;
+  padding: 12px;
+  background: #FF5C00;
+  color: #FFFFFF;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 3px 14px rgba(255,92,0,0.25);
+  transition: transform 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.3px;
+}
+
+.profile-card .save-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(255,92,0,0.4);
+}
+
+.profile-card .save-btn:disabled {
+  background: #D1D5DB;
+  color: #9CA3AF;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.profile-card .error-message {
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 10px;
+  color: #991B1B;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.profile-card .success-message {
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  border-radius: 10px;
+  color: #166534;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
 }

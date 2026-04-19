@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Calendar, User, Package, Activity } from 'lucide-react';
-import { playerService } from '../services/playerService'; // Import the new service
+import { playerService } from '../services/playerService';
+import InnerNavbar from '../components/InnerNavbar';
 import '../styles/AdminDashboard.css';
 
 function isAdminRole(role) {
@@ -18,7 +19,6 @@ export default function PlayerDashboard() {
   const role = auth.user?.role;
   const isAdmin = isAdminRole(role);
 
-  // Real state for our data
   const [stats, setStats] = useState({
     attendancePercentage: 0,
     sessionsAttended: 0,
@@ -34,7 +34,6 @@ export default function PlayerDashboard() {
       return;
     }
 
-    // Fetch the real data from the backend!
     const fetchStats = async () => {
       try {
         const response = await playerService.getDashboardStats();
@@ -55,7 +54,7 @@ export default function PlayerDashboard() {
 
   const handleLogout = () => {
     auth.logout();
-    navigate('/login', { replace: true });
+    navigate('/', { replace: true });
   };
 
   const attendanceData = [
@@ -69,15 +68,12 @@ export default function PlayerDashboard() {
 
   return (
     <div className="admin-dashboard-container">
-      <nav className="navbar">
-        <div className="nav-content">
-          <h1>Tennis Management System</h1>
-          <div className="nav-right">
-            <span className="welcome-text">Welcome, {username}!</span>
-            <button className="logout-btn" onClick={handleLogout}>Logout</button>
-          </div>
-        </div>
-      </nav>
+      <InnerNavbar
+        title="Player Dashboard"
+        username={username}
+        backTo="/"
+        onLogout={handleLogout}
+      />
 
       <div className="admin-content" style={{ maxWidth: '1000px', margin: '0 auto' }}>
         <h2 style={{ fontSize: '28px', marginBottom: '24px', color: '#111827' }}>My Dashboard</h2>

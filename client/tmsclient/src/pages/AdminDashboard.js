@@ -8,7 +8,22 @@ import LiveScoring from './LiveScoring';
 import InventoryPage from './InventoryPage';
 import PracticeSessionManagement from '../components/PracticeSessionManagement';
 import AdminAttendanceManagement from '../components/AdminAttendanceManagement';
-import AttendanceReport from '../components/AttendanceReport'; // <-- Your component
+import AttendanceReport from '../components/AttendanceReport';
+import SystemStatus from '../components/SystemStatus';
+import { 
+  Trophy, 
+  Calendar, 
+  Layout, 
+  Activity, 
+  Package, 
+  History, 
+  Users, 
+  Settings, 
+  FileText,
+  UserCheck,
+  CheckCircle
+} from 'lucide-react';
+import InnerNavbar from '../components/InnerNavbar';
 
 import { API_ENDPOINTS } from '../config/api';
 import '../styles/AdminDashboard.css';
@@ -37,7 +52,6 @@ export default function AdminDashboard() {
   };
   const [pendingRequests, setPendingRequests] = useState([]);
   
-  // Teammate's new State variables for Player Management
   const [players, setPlayers] = useState([]);
   const [playersLoading, setPlayersLoading] = useState(false);
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
@@ -58,7 +72,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (auth.loading) return;
     if (!auth.isAuthenticated) {
-      navigate('/login');
+      navigate('/');
       return;
     }
     if (!isAdminRole(role)) {
@@ -89,7 +103,6 @@ export default function AdminDashboard() {
     }
   }
 
-  // Teammate's new function
   async function loadPlayers() {
     try {
       setPlayersLoading(true);
@@ -110,7 +123,6 @@ export default function AdminDashboard() {
     }
   }
 
-  // Teammate's new function
   async function openPlayerDetails(playerId) {
     try {
       setPlayersError('');
@@ -137,7 +149,6 @@ export default function AdminDashboard() {
     }
   }
 
-  // Teammate's new function
   function handlePlayerFormChange(event) {
     const { name, value, type, checked } = event.target;
     setPlayerForm(prev => ({
@@ -146,7 +157,6 @@ export default function AdminDashboard() {
     }));
   }
 
-  // Teammate's new function
   async function savePlayerChanges() {
     if (!selectedPlayerId) return;
     try {
@@ -222,212 +232,217 @@ export default function AdminDashboard() {
 
   function handleLogout() {
     auth.logout();
-    navigate('/login');
+    navigate('/');
   }
 
   function handleTournamentAdded() {
     setTournamentRefresh(prev => prev + 1);
   }
 
-  return React.createElement(
-    'div',
-    { className: 'admin-dashboard-container' },
+  const navItems = [
+    { id: 'tournaments', label: 'Events', icon: <Trophy size={16} /> },
+    { id: 'calendar', label: 'Calendar', icon: <Calendar size={16} /> },
+    { id: 'bracket', label: 'Arena', icon: <Layout size={16} /> },
+    { id: 'live-scoring', label: 'Live SC', icon: <Activity size={16} /> },
+    { id: 'practice', label: 'Practice', icon: <History size={16} /> },
+    { id: 'attendance', label: 'Attendance', icon: <UserCheck size={16} /> },
+    { id: 'inventory', label: 'Inventory', icon: <Package size={16} /> },
+    { id: 'approvals', label: 'Queue', icon: <CheckCircle size={16} /> },
+    { id: 'players', label: 'Athletes', icon: <Users size={16} /> },
+    { id: 'status', label: 'Settings', icon: <Settings size={16} /> },
+    { id: 'reports', label: 'Reports', icon: <FileText size={16} /> },
+  ];
 
-    React.createElement(
-      'nav',
-      { className: 'navbar' },
-      React.createElement(
-        'div',
-        { className: 'nav-content' },
-        React.createElement('h1', null, 'Admin Panel'),
+  return (
+    <div className="admin-dashboard-container">
+      {/* ── Top Navbar ── */}
+      <InnerNavbar
+        title="Admin Panel"
+        username={username}
+        backTo="/"
+        onLogout={handleLogout}
+      />
 
-        React.createElement('div', { className: 'nav-right' },
-          React.createElement('span', { className: 'welcome-text' }, `Welcome, ${username}`),
+      {/* ── Secondary Navigation Bar ── */}
+      <div className="admin-subnav">
+        <div className="admin-subnav__inner">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              className={`admin-subnav__item ${activeTab === item.id ? 'admin-subnav__item--active' : ''}`}
+              onClick={() => {
+                setActiveTab(item.id);
+                if (item.id === 'players') loadPlayers();
+              }}
+            >
+              <span className="admin-subnav__icon">{item.icon}</span>
+              <span className="admin-subnav__label">{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
-          React.createElement('button',
-            { className: 'back-btn', onClick: () => navigate('/dashboard') },
-            'Dashboard'
-          ),
+      {/* ── Page Content ── */ }
+      <div className="admin-page-content">
+        {activeTab === 'tournaments' && <TournamentManagement token={auth.token} onTournamentAdded={handleTournamentAdded} key="tab-tournaments" />}
+        {activeTab === 'calendar' && <TournamentCalendar token={auth.token} refreshTrigger={tournamentRefresh} key="tab-calendar" />}
+        {activeTab === 'bracket' && <TournamentBracket token={auth.token} key="tab-bracket" onOpenLiveScoring={() => setActiveTab('live-scoring')} />}
+        {activeTab === 'live-scoring' && <LiveScoring key="tab-live-scoring" />}
+        {activeTab === 'inventory' && <InventoryPage isAdmin={true} userId={auth.user?.id} key="tab-inventory" />}
+        {activeTab === 'practice' && <PracticeSessionManagement token={auth.token} key="tab-practice" />}
+        {activeTab === 'attendance' && <AdminAttendanceManagement token={auth.token} key="tab-attendance" />}
+        {activeTab === 'reports' && <AttendanceReport key="tab-reports" />}
+        {activeTab === 'status' && <SystemStatus key="tab-status" />}
 
-          React.createElement('button',
-            { className: 'logout-btn', onClick: handleLogout },
-            'Logout'
-          )
-        )
-      )
-    ),
+        {activeTab === 'players' && (
+          <div className="admin-card" key="tab-players">
+            <h2 className="admin-card__title">Athlete Administration</h2>
+            {playersError && <div className="error-message">{playersError}</div>}
+            {playersSuccess && <div className="success-message">{playersSuccess}</div>}
+            
+            {playersLoading ? (
+              <div className="loading">Retrieving athletes...</div>
+            ) : (
+              <div className="players-management-grid">
+                <div className="requests-table scrollable" style={{ border: '1px solid #eef2f6' }}>
+                  <table style={{ minWidth: '800px' }}>
+                    <thead>
+                      <tr>
+                        <th>Username</th>
+                        <th>Email Address</th>
+                        <th>Identity No.</th>
+                        <th>Account Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(players || []).map((player) => (
+                        <tr
+                          key={player.id}
+                          onClick={() => openPlayerDetails(player.id)}
+                          className={selectedPlayerId === player.id ? 'selected-row' : ''}
+                        >
+                          <td style={{ fontWeight: '800', color: '#000040' }}>{player.username}</td>
+                          <td>{player.email}</td>
+                          <td><code>{player.identityNumber}</code></td>
+                          <td>
+                            <span className={`status-badge ${player.isApproved ? 'status-completed' : 'status-scheduled'}`}>
+                              {player.isApproved ? 'Approved' : 'Pending'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
 
-    React.createElement('div', { className: 'admin-content' },
-      React.createElement('div', { className: 'tabs-container' },
-        React.createElement('div', { className: 'tabs-nav' },
-          React.createElement('button',
-            { className: `tab-button ${activeTab === 'tournaments' ? 'active' : ''}`, onClick: () => setActiveTab('tournaments') },
-            'Tournament Management'
-          ),
-          React.createElement('button',
-            { className: `tab-button ${activeTab === 'calendar' ? 'active' : ''}`, onClick: () => setActiveTab('calendar') },
-            'Tournament Calendar'
-          ),
-          React.createElement('button',
-            { className: `tab-button ${activeTab === 'approvals' ? 'active' : ''}`, onClick: () => setActiveTab('approvals') },
-            'Player Approvals'
-          ),
-          React.createElement('button',
-            { className: `tab-button ${activeTab === 'bracket' ? 'active' : ''}`, onClick: () => setActiveTab('bracket') },
-            'Tournament Bracket'
-          ),
-          React.createElement('button',
-            { className: `tab-button ${activeTab === 'live-scoring' ? 'active' : ''}`, onClick: () => setActiveTab('live-scoring') },
-            'Live Scoring'
-          ),
-          React.createElement('button',
-            { className: `tab-button ${activeTab === 'inventory' ? 'active' : ''}`, onClick: () => setActiveTab('inventory') },
-            'Inventory'
-          ),
-          React.createElement('button',
-            { className: `tab-button ${activeTab === 'practice' ? 'active' : ''}`, onClick: () => setActiveTab('practice') },
-            'Practice Sessions'
-          ),
-          React.createElement('button',
-            { className: `tab-button ${activeTab === 'attendance' ? 'active' : ''}`, onClick: () => setActiveTab('attendance') },
-            'Mark Attendance' // Clarified the name so it doesn't conflict with your report
-          ),
-          React.createElement('button',
-            { className: `tab-button ${activeTab === 'players' ? 'active' : ''}`, onClick: () => { setActiveTab('players'); loadPlayers(); } },
-            'Players'
-          ),
-          // --- YOUR NEW TAB BUTTON ---
-          React.createElement('button',
-            { className: `tab-button ${activeTab === 'reports' ? 'active' : ''}`, onClick: () => setActiveTab('reports') },
-            'Attendance Reports'
-          )
-        ),
+                <div className="player-details-card" style={{ border: '1px solid #eef2f6', borderRadius: '20px', background: '#FFFFFF', boxShadow: '0 4px 12px rgba(0,0,64,0.02)' }}>
+                  {!selectedPlayer ? (
+                    <div className="no-data" style={{ background: 'transparent', border: 'none', padding: '40px' }}>
+                      Select an athlete from the list to view and manage their full profile details.
+                    </div>
+                  ) : (
+                    <div>
+                      <h3 style={{ margin: '0 0 24px 0', fontSize: '1.2rem', color: '#000040' }}>Athlete Profile: {selectedPlayer.username}</h3>
+                      <div className="player-form-grid">
+                        <div className="form-group-item">
+                          <label>Full Username</label>
+                          <input name="username" value={playerForm.username} onChange={handlePlayerFormChange} />
+                        </div>
+                        <div className="form-group-item">
+                          <label>Email Address</label>
+                          <input name="email" value={playerForm.email} onChange={handlePlayerFormChange} />
+                        </div>
+                        <div className="form-group-item">
+                          <label>Identity Number</label>
+                          <input name="identityNumber" value={playerForm.identityNumber} onChange={handlePlayerFormChange} />
+                        </div>
+                        <div className="form-group-item">
+                          <label>Contact Number</label>
+                          <input name="contactNumber" value={playerForm.contactNumber} onChange={handlePlayerFormChange} />
+                        </div>
+                        <div className="form-group-item">
+                          <label>Residential Address</label>
+                          <textarea name="address" value={playerForm.address} onChange={handlePlayerFormChange} rows={3} />
+                        </div>
+                        <div className="form-group-item">
+                          <label>System Role</label>
+                          <select name="role" value={playerForm.role} onChange={handlePlayerFormChange}>
+                            <option value={1}>System Admin</option>
+                            <option value={2}>Admin</option>
+                            <option value={3}>Player</option>
+                            <option value={4}>Pending Player</option>
+                          </select>
+                        </div>
+                        <div className="form-group-item">
+                          <label>Reset Password</label>
+                          <input type="password" name="newPassword" value={playerForm.newPassword} onChange={handlePlayerFormChange} placeholder="Leave blank to keep current" />
+                        </div>
+                        <div className="checkbox-row" style={{ margin: '12px 0' }}>
+                          <input type="checkbox" name="isApproved" checked={playerForm.isApproved} onChange={handlePlayerFormChange} style={{ transform: 'scale(1.2)' }} />
+                          <span style={{ fontWeight: 700, fontSize: '14px', color: '#000040' }}>Approved Account</span>
+                        </div>
+                        
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                          <div className="readonly-meta"><strong>Joined: </strong>{selectedPlayer.createdAt ? new Date(selectedPlayer.createdAt).toLocaleDateString() : '-'}</div>
+                          <div className="readonly-meta"><strong>Approved: </strong>{selectedPlayer.approvedAt ? new Date(selectedPlayer.approvedAt).toLocaleDateString() : '-'}</div>
+                        </div>
+                        
+                        <button className="btn-primary" onClick={savePlayerChanges} disabled={savingPlayer} style={{ width: '100%', padding: '12px' }}>
+                          {savingPlayer ? 'Synchronizing Profile...' : 'Commit Profile Changes'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
-        React.createElement('div', { className: 'tabs-content' }, [
-          activeTab === 'tournaments' && React.createElement(TournamentManagement, { token: auth.token, onTournamentAdded: handleTournamentAdded, key: "tab-tournaments" }),
-          activeTab === 'calendar' && React.createElement(TournamentCalendar, { token: auth.token, refreshTrigger: tournamentRefresh, key: "tab-calendar" }),
-          activeTab === 'bracket' && React.createElement(TournamentBracket, { token: auth.token, key: "tab-bracket", onOpenLiveScoring: () => setActiveTab('live-scoring') }),
-          activeTab === 'live-scoring' && React.createElement(LiveScoring, { key: "tab-live-scoring" }),
-          activeTab === 'inventory' && React.createElement(InventoryPage, { isAdmin: true, userId: auth.user?.id, key: "tab-inventory" }),
-          activeTab === 'practice' && React.createElement(PracticeSessionManagement, { token: auth.token, key: "tab-practice" }),
-          
-          // Teammate's new component
-          activeTab === 'attendance' && React.createElement(AdminAttendanceManagement, { token: auth.token, key: 'tab-attendance' }),
-          
-          // --- YOUR NEW COMPONENT ---
-          activeTab === 'reports' && React.createElement(AttendanceReport, { key: "tab-reports" }),
-
-          activeTab === 'players' && React.createElement('div', { className: 'approvals-tab', key: 'tab-players' },
-            React.createElement('h2', null, 'Registered Players'),
-            playersError && React.createElement('div', { className: 'error-message' }, playersError),
-            playersSuccess && React.createElement('div', { className: 'success-message' }, playersSuccess),
-            playersLoading
-              ? React.createElement('div', { className: 'loading' }, 'Loading players...')
-              : React.createElement('div', { className: 'players-management-grid' },
-                React.createElement('div', { className: 'requests-table' },
-                  React.createElement('table', null,
-                    React.createElement('thead', null,
-                      React.createElement('tr', null,
-                        React.createElement('th', null, 'Username'),
-                        React.createElement('th', null, 'Email'),
-                        React.createElement('th', null, 'Identity Number'),
-                        React.createElement('th', null, 'Status')
-                      )
-                    ),
-                    React.createElement('tbody', null,
-                      (players || []).map(player =>
-                        React.createElement('tr', { key: player.id, onClick: () => openPlayerDetails(player.id), className: selectedPlayerId === player.id ? 'selected-row' : '' },
-                          React.createElement('td', null, player.username),
-                          React.createElement('td', null, player.email),
-                          React.createElement('td', null, player.identityNumber),
-                          React.createElement('td', null, player.isApproved ? 'Approved' : 'Pending')
-                        )
-                      )
-                    )
-                  )
-                ),
-                React.createElement('div', { className: 'player-details-card' },
-                  !selectedPlayer
-                    ? React.createElement('p', null, 'Select a player to view and edit full details.')
-                    : React.createElement('div', null,
-                      React.createElement('h3', null, `Edit Player #${selectedPlayer.id}`),
-                      React.createElement('div', { className: 'player-form-grid' },
-                        React.createElement('label', null, 'Username'),
-                        React.createElement('input', { name: 'username', value: playerForm.username, onChange: handlePlayerFormChange }),
-                        React.createElement('label', null, 'Email'),
-                        React.createElement('input', { name: 'email', value: playerForm.email, onChange: handlePlayerFormChange }),
-                        React.createElement('label', null, 'Identity Number'),
-                        React.createElement('input', { name: 'identityNumber', value: playerForm.identityNumber, onChange: handlePlayerFormChange }),
-                        React.createElement('label', null, 'Contact Number'),
-                        React.createElement('input', { name: 'contactNumber', value: playerForm.contactNumber, onChange: handlePlayerFormChange }),
-                        React.createElement('label', null, 'Address'),
-                        React.createElement('textarea', { name: 'address', value: playerForm.address, onChange: handlePlayerFormChange, rows: 3 }),
-                        React.createElement('label', null, 'Role'),
-                        React.createElement('select', { name: 'role', value: playerForm.role, onChange: handlePlayerFormChange }, [
-                          React.createElement('option', { key: 'role-1', value: 1 }, 'SystemAdmin'),
-                          React.createElement('option', { key: 'role-2', value: 2 }, 'Admin'),
-                          React.createElement('option', { key: 'role-3', value: 3 }, 'Player'),
-                          React.createElement('option', { key: 'role-4', value: 4 }, 'PendingPlayer')
-                        ]),
-                        React.createElement('label', null, 'Reset Password (optional)'),
-                        React.createElement('input', { name: 'newPassword', value: playerForm.newPassword, onChange: handlePlayerFormChange, placeholder: 'Leave blank to keep current password' }),
-                        React.createElement('label', { className: 'checkbox-row' },
-                          React.createElement('input', { type: 'checkbox', name: 'isApproved', checked: playerForm.isApproved, onChange: handlePlayerFormChange }),
-                          ' Approved'
-                        ),
-                        React.createElement('div', { className: 'readonly-meta' },
-                          React.createElement('strong', null, 'Created: '),
-                          selectedPlayer.createdAt ? new Date(selectedPlayer.createdAt).toLocaleString() : '-'
-                        ),
-                        React.createElement('div', { className: 'readonly-meta' },
-                          React.createElement('strong', null, 'Approved At: '),
-                          selectedPlayer.approvedAt ? new Date(selectedPlayer.approvedAt).toLocaleString() : '-'
-                        ),
-                        React.createElement('button', { className: 'approve-btn', onClick: savePlayerChanges, disabled: savingPlayer },
-                          savingPlayer ? 'Saving...' : 'Save Player Details'
-                        )
-                      )
-                    )
-                )
-              )
-          ),
-
-          activeTab === 'approvals' && React.createElement('div', { className: 'approvals-tab', key: "tab-approvals" },
-            React.createElement('h2', null, 'Pending Registration Requests'),
-            error && React.createElement('div', { className: 'error-message' }, error),
-            successMessage && React.createElement('div', { className: 'success-message' }, successMessage),
-            loading
-              ? React.createElement('div', { className: 'loading' }, 'Loading...')
-              : pendingRequests.length === 0
-                ? React.createElement('div', { className: 'no-requests' }, React.createElement('p', null, 'No pending registration requests'))
-                : React.createElement('div', { className: 'requests-table' },
-                  React.createElement('table', null,
-                    React.createElement('thead', null,
-                      React.createElement('tr', null,
-                        React.createElement('th', null, 'Username'), React.createElement('th', null, 'Identity Number'),
-                        React.createElement('th', null, 'Email'), React.createElement('th', null, 'Requested Date'),
-                        React.createElement('th', null, 'Actions')
-                      )
-                    ),
-                    React.createElement('tbody', null,
-                      pendingRequests.map(req =>
-                        React.createElement('tr', { key: req.id },
-                          React.createElement('td', null, req.username), React.createElement('td', null, req.identityNumber),
-                          React.createElement('td', null, req.email), React.createElement('td', null, new Date(req.createdAt).toLocaleDateString()),
-                          React.createElement('td', null,
-                            React.createElement('div', { className: 'actions-cell' },
-                              React.createElement('button', { className: 'approve-btn', onClick: () => approve(req.id, req.username) }, 'Approve'),
-                              React.createElement('button', { className: 'reject-btn', onClick: () => reject(req.id, req.username) }, 'Reject')
-                            )
-                          )
-                        )
-                      )
-                    )
-                  )
-                )
-          )
-        ])
-      )
-    )
+        {activeTab === 'approvals' && (
+          <div className="admin-card" key="tab-approvals">
+            <h2 className="admin-card__title">Registration Queue</h2>
+            {error && <div className="error-message">{error}</div>}
+            {successMessage && <div className="success-message">{successMessage}</div>}
+            
+            {loading ? (
+              <div className="loading">Processing queue...</div>
+            ) : pendingRequests.length === 0 ? (
+              <div className="no-data">No new registration requests in the queue.</div>
+            ) : (
+              <div className="requests-table scrollable" style={{ border: '1px solid #eef2f6', borderRadius: '20px' }}>
+                <table style={{ minWidth: '950px' }}>
+                  <thead>
+                    <tr>
+                      <th style={{ width: '200px' }}>Applicant</th>
+                      <th style={{ width: '180px' }}>Identity No.</th>
+                      <th style={{ width: '250px' }}>Email Address</th>
+                      <th style={{ width: '150px' }}>Applied On</th>
+                      <th style={{ textAlign: 'center' }}>Approval Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pendingRequests.map((req) => (
+                      <tr key={req.id}>
+                        <td style={{ fontWeight: '800', color: '#000040' }}>{req.username}</td>
+                        <td><code>{req.identityNumber}</code></td>
+                        <td>{req.email}</td>
+                        <td>{new Date(req.createdAt).toLocaleDateString()}</td>
+                        <td>
+                          <div className="actions-cell" style={{ justifyContent: 'center' }}>
+                            <button className="btn-primary" style={{ padding: '6px 20px', borderRadius: '50px' }} onClick={() => approve(req.id, req.username)}>Approve</button>
+                            <button className="btn-danger" style={{ padding: '6px 20px', borderRadius: '50px' }} onClick={() => reject(req.id, req.username)}>Reject</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

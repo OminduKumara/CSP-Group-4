@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import API_BASE_URL from '../config/api';
+import InnerNavbar from '../components/InnerNavbar';
 import '../styles/PlayerAttendance.css';
 
 export default function PlayerAttendance() {
@@ -42,14 +43,11 @@ export default function PlayerAttendance() {
 
   return (
     <div className="player-attendance-container">
-      <nav className="navbar">
-        <div className="nav-content">
-          <h1>My Attendance</h1>
-          <div className="nav-right">
-            <button className="back-btn" onClick={() => navigate('/dashboard')}>Dashboard</button>
-          </div>
-        </div>
-      </nav>
+      <InnerNavbar
+        title="Practice Sessions"
+        username={auth.user?.username}
+        onLogout={() => { auth.logout(); navigate('/'); }}
+      />
 
       <div className="attendance-content">
         {error ? <div className="error-message">{error}</div> : null}

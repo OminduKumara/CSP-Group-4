@@ -72,13 +72,14 @@ builder.Services.AddScoped<ITournamentTeamRepository, TournamentTeamRepository>(
 builder.Services.AddScoped<ITournamentMatchRepository, TournamentMatchRepository>();
 builder.Services.AddScoped<IMatchScoreRepository, MatchScoreRepository>();
 builder.Services.AddScoped<ILiveGameScoreRepository, LiveGameScoreRepository>();
-
-// ADDED THIS LINE to fix the 500 Internal Server Error
 builder.Services.AddScoped<PracticeSessionRepository>();
 
 // Add services
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
+
+// --- DEVOPS PHASE 1: BACKGROUND MONITORING ---
+builder.Services.AddHostedService<HealthMonitorService>();
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -167,6 +168,7 @@ static async Task InitializeDatabaseAsync(string connectionString)
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"
+                    /* Existing Tables ... */
                     IF OBJECT_ID('dbo.Tournaments', 'U') IS NULL
                     BEGIN
                         CREATE TABLE dbo.Tournaments (
@@ -353,6 +355,17 @@ static async Task InitializeDatabaseAsync(string connectionString)
                         CREATE INDEX idx_practiceattendance_player_date ON dbo.PracticeAttendance(PlayerId, AttendanceDate);
                     END;
                     
+                    /* --- DEVOPS PHASE 1: HEALTH MONITORING TABLE --- */
+                    IF OBJECT_ID('dbo.SystemHealthLogs', 'U') IS NULL
+                    BEGIN
+                        CREATE TABLE dbo.SystemHealthLogs (
+                            Id INT PRIMARY KEY IDENTITY(1,1),
+                            Status VARCHAR(50) NOT NULL,
+                            PingedAt DATETIME NOT NULL DEFAULT GETUTCDATE()
+                        );
+                        CREATE INDEX idx_health_pingedat ON dbo.SystemHealthLogs(PingedAt);
+                    END;
+
                     IF COL_LENGTH('dbo.Users', 'ContactNumber') IS NULL
                     BEGIN
                         ALTER TABLE dbo.Users ADD ContactNumber NVARCHAR(30) NULL;

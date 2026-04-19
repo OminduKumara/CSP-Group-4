@@ -23,16 +23,18 @@ export default function TournamentCalendar({ token, refreshTrigger }) {
     try {
       setLoading(true);
       setError('');
+      
       const tournaments = await tournamentService.getAllTournaments();
       
       const calendarEvents = tournaments.map(tournament => ({
-        id: tournament.id,
+        id: `tournament-${tournament.id}`,
         title: tournament.name,
         start: new Date(tournament.startDate),
         end: new Date(tournament.endDate),
         resource: {
           description: tournament.description,
           status: tournament.status,
+          type: 'tournament',
           tournament: tournament
         }
       }));
@@ -51,12 +53,13 @@ export default function TournamentCalendar({ token, refreshTrigger }) {
 
   function getStatusColor(status) {
     const colors = {
-      'Scheduled': '#007bff',
-      'InProgress': '#ffc107',
-      'Completed': '#28a745',
-      'Cancelled': '#dc3545'
+      'Scheduled': '#38bdf8',
+      'InProgress': '#FF5C00',
+      'Completed': '#22c55e',
+      'Cancelled': '#f43f5e',
+      'Practice': '#8b5cf6'
     };
-    return colors[status] || '#6c757d';
+    return colors[status] || '#64748b';
   }
 
   const eventStyleGetter = (event) => {
@@ -64,11 +67,13 @@ export default function TournamentCalendar({ token, refreshTrigger }) {
     return {
       style: {
         backgroundColor,
-        borderRadius: '5px',
-        opacity: 0.8,
+        borderRadius: '8px',
+        opacity: 0.9,
         color: 'white',
         border: '0px',
-        display: 'block'
+        display: 'block',
+        fontSize: '11px',
+        fontWeight: '700'
       }
     };
   };
@@ -76,9 +81,9 @@ export default function TournamentCalendar({ token, refreshTrigger }) {
   return (
     <div className="tournament-calendar">
       <div className="calendar-header">
-        <h2>Tournament Calendar</h2>
+        <h2>Tournament Schedule</h2>
         <button onClick={loadTournaments} className="btn-refresh" disabled={loading}>
-          {loading ? 'Loading...' : 'Refresh'}
+          {loading ? 'Refreshing...' : 'Refresh Data'}
         </button>
       </div>
 
@@ -86,7 +91,7 @@ export default function TournamentCalendar({ token, refreshTrigger }) {
 
       <div className="calendar-container">
         {loading && events.length === 0 ? (
-          <div className="loading">Loading calendar...</div>
+          <div className="loading">Synchronizing Calendar...</div>
         ) : (
           <>
             <Calendar
@@ -96,7 +101,7 @@ export default function TournamentCalendar({ token, refreshTrigger }) {
               endAccessor="end"
               onSelectEvent={handleSelectEvent}
               eventPropGetter={eventStyleGetter}
-              style={{ height: 500 }}
+              style={{ height: 600 }}
               popup
               selectable
               view={view}
@@ -107,19 +112,19 @@ export default function TournamentCalendar({ token, refreshTrigger }) {
             
             <div className="calendar-legend">
               <div className="legend-item">
-                <div className="legend-color" style={{ backgroundColor: '#007bff' }}></div>
+                <div className="legend-color" style={{ backgroundColor: '#38bdf8' }}></div>
                 <span>Scheduled</span>
               </div>
               <div className="legend-item">
-                <div className="legend-color" style={{ backgroundColor: '#ffc107' }}></div>
-                <span>In Progress</span>
+                <div className="legend-color" style={{ backgroundColor: '#FF5C00' }}></div>
+                <span>Active</span>
               </div>
               <div className="legend-item">
-                <div className="legend-color" style={{ backgroundColor: '#28a745' }}></div>
+                <div className="legend-color" style={{ backgroundColor: '#22c55e' }}></div>
                 <span>Completed</span>
               </div>
               <div className="legend-item">
-                <div className="legend-color" style={{ backgroundColor: '#dc3545' }}></div>
+                <div className="legend-color" style={{ backgroundColor: '#f43f5e' }}></div>
                 <span>Cancelled</span>
               </div>
             </div>
@@ -142,27 +147,34 @@ export default function TournamentCalendar({ token, refreshTrigger }) {
               </span>
             </div>
 
+            <div className="event-detail-item">
+              <strong>Category & Type:</strong>
+              <p>{selectedEvent.resource.type === 'tournament' ? 'Official Tournament' : `Practice (${selectedEvent.resource.session?.sessionType || 'Session'})`}</p>
+            </div>
+
             {selectedEvent.resource.description && (
               <div className="event-detail-item">
-                <strong>Description:</strong>
+                <strong>Details:</strong>
                 <p>{selectedEvent.resource.description}</p>
               </div>
             )}
 
             <div className="event-detail-item">
-              <strong>Start Date:</strong>
+              <strong>Start:</strong>
               <p>{moment(selectedEvent.start).format('MMMM D, YYYY HH:mm')}</p>
             </div>
 
             <div className="event-detail-item">
-              <strong>End Date:</strong>
+              <strong>End:</strong>
               <p>{moment(selectedEvent.end).format('MMMM D, YYYY HH:mm')}</p>
             </div>
 
-            <div className="event-detail-item">
-              <strong>Duration:</strong>
-              <p>{moment(selectedEvent.end).diff(moment(selectedEvent.start), 'days')} days</p>
-            </div>
+            {selectedEvent.resource.type === 'session' && selectedEvent.resource.session && (
+              <div className="event-detail-item">
+                <strong>Recurring Day:</strong>
+                <p>{selectedEvent.resource.session.dayOfWeek}</p>
+              </div>
+            )}
 
             <button className="btn-close" onClick={() => setSelectedEvent(null)}>
               Close

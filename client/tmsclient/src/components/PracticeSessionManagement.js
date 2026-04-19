@@ -85,7 +85,7 @@ export default function PracticeSessionManagement({ token }) {
       console.error("Save error:", err);
       setError("Cannot save to database while Azure Firewall is blocking connection.");
     }
-  }; // <-- This bracket was missing!
+  };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this practice session?")) return;
@@ -102,7 +102,15 @@ export default function PracticeSessionManagement({ token }) {
       console.error("Delete error:", err);
       setError("Cannot delete from database while Azure Firewall is blocking connection.");
     }
-  }; // <-- This bracket was missing too!
+  }; 
+
+  const [selectedSessionDetail, setSelectedSessionDetail] = useState(null);
+
+  const handleRowClick = (session, e) => {
+    // Prevent modal if clicking action buttons or internal inputs
+    if (e.target.closest('.actions-cell') || e.target.closest('input') || e.target.closest('select')) return;
+    setSelectedSessionDetail(session);
+  };
 
   return (
     <div className="approvals-tab">
@@ -112,74 +120,143 @@ export default function PracticeSessionManagement({ token }) {
       {success && <div className="success-message">{success}</div>}
 
       {/* Input Form */}
-      <div style={{ background: 'white', padding: '20px', borderRadius: '12px', border: '1px solid #e5e7eb', marginBottom: '24px' }}>
-        <h3 style={{ marginTop: 0 }}>{editingId ? 'Edit Session' : 'Add New Session'}</h3>
-        <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+      <div className="admin-card" style={{ marginBottom: '32px' }}>
+        <h3 style={{ marginTop: 0, marginBottom: '24px', fontSize: '1.2rem' }}>{editingId ? 'Modify Session Details' : 'Create New Practice Session'}</h3>
+        <form onSubmit={handleSubmit} className="practice-form-grid">
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-            <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#6b7280' }}>Day</label>
-            <select name="dayOfWeek" value={formData.dayOfWeek} onChange={handleInputChange} style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #d1d5db' }}>
+          <div className="form-group-item">
+            <label>Day of Week</label>
+            <select name="dayOfWeek" value={formData.dayOfWeek} onChange={handleInputChange}>
               {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
                 <option key={day} value={day}>{day}</option>
               ))}
             </select>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-            <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#6b7280' }}>Start Time</label>
-            <input type="text" name="startTime" value={formData.startTime} onChange={handleInputChange} placeholder="e.g. 3:00 PM" required style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #d1d5db' }} />
+          <div className="form-group-item">
+            <label>Start Time</label>
+            <input type="text" name="startTime" value={formData.startTime} onChange={handleInputChange} placeholder="e.g. 3:00 PM" required />
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-            <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#6b7280' }}>End Time</label>
-            <input type="text" name="endTime" value={formData.endTime} onChange={handleInputChange} placeholder="e.g. 6:30 PM" required style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #d1d5db' }} />
+          <div className="form-group-item">
+            <label>End Time</label>
+            <input type="text" name="endTime" value={formData.endTime} onChange={handleInputChange} placeholder="e.g. 6:30 PM" required />
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-            <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#6b7280' }}>Session Type</label>
-            <input type="text" name="sessionType" value={formData.sessionType} onChange={handleInputChange} placeholder="e.g. Team Practice" required style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #d1d5db' }} />
+          <div className="form-group-item">
+            <label>Session Category</label>
+            <input type="text" name="sessionType" value={formData.sessionType} onChange={handleInputChange} placeholder="e.g. Team Practice" required />
           </div>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button type="submit" className="approve-btn">{editingId ? 'Update' : 'Add Session'}</button>
-            {editingId && <button type="button" className="reject-btn" style={{ background: '#6b7280' }} onClick={cancelEdit}>Cancel</button>}
+          <div className="form-actions-practice">
+            <button type="submit" className="btn-primary" style={{ padding: '10px 24px' }}>
+              {editingId ? 'Update' : 'Add Session'}
+            </button>
+            {editingId && (
+              <button 
+                type="button" 
+                className="btn-secondary" 
+                style={{ background: '#64748b', padding: '10px 24px' }} 
+                onClick={cancelEdit}
+              >
+                Cancel
+              </button>
+            )}
           </div>
         </form>
       </div>
 
       {/* Data Table */}
       {loading ? (
-        <div className="loading">Loading sessions...</div>
+        <div className="loading">Synchronizing Sessions...</div>
       ) : (
-        <div className="requests-table">
+        <div className="requests-table scrollable">
           <table>
             <thead>
               <tr>
-                <th>Day</th>
-                <th>Time Range</th>
-                <th>Session Type</th>
-                <th>Actions</th>
+                <th>Practice Day</th>
+                <th>Time Window</th>
+                <th>Session Profile</th>
+                <th style={{ textAlign: 'right' }}>Management</th>
               </tr>
             </thead>
             <tbody>
               {sessions.map(session => (
-                <tr key={session.id}>
+                <tr 
+                  key={session.id} 
+                  onClick={(e) => handleRowClick(session, e)}
+                  style={{ cursor: 'pointer' }}
+                  className="interactive-row"
+                >
                   <td><strong>{session.dayOfWeek}</strong></td>
-                  <td>{session.startTime} - {session.endTime}</td>
-                  <td>{session.sessionType}</td>
+                  <td>{session.startTime} — {session.endTime}</td>
                   <td>
-                    <div className="actions-cell">
-                      <button className="approve-btn" style={{ background: '#3b82f6' }} onClick={() => handleEdit(session)}>Edit</button>
-                      <button className="reject-btn" onClick={() => handleDelete(session.id)}>Delete</button>
+                    <span className="status-badge" style={{ background: '#e0f2fe', color: '#0369a1', fontWeight: 800 }}>
+                      {session.sessionType}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="actions-cell" style={{ justifyContent: 'flex-end' }}>
+                      <button 
+                        className="btn-secondary btn-sm" 
+                        style={{ height: '32px' }}
+                        onClick={() => handleEdit(session)}
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        className="btn-danger btn-sm" 
+                        style={{ height: '32px' }}
+                        onClick={() => handleDelete(session.id)}
+                      >
+                        Delete
+                      </button>
                     </div>
                   </td>
                 </tr>
               ))}
               {sessions.length === 0 && (
-                <tr><td colSpan="4" style={{ textAlign: 'center' }}>No practice sessions found.</td></tr>
+                <tr><td colSpan="4" style={{ textAlign: 'center', opacity: 0.5 }}>No scheduled practice sessions found.</td></tr>
               )}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Session Detail Modal */}
+      {selectedSessionDetail && (
+        <div className="event-details-overlay" onClick={() => setSelectedSessionDetail(null)}>
+          <div className="event-details-modal" onClick={e => e.stopPropagation()}>
+            <button className="close-btn" onClick={() => setSelectedSessionDetail(null)}>×</button>
+            <div className="event-details-header">
+              <h3>Practice Session Details</h3>
+              <span className="status-badge" style={{ background: '#8b5cf6', color: 'white' }}>ACTIVE</span>
+            </div>
+            
+            <div className="event-detail-item" style={{ marginTop: '24px' }}>
+              <strong>Session Category:</strong>
+              <p>{selectedSessionDetail.sessionType}</p>
+            </div>
+
+            <div className="event-detail-item">
+              <strong>Scheduled Day:</strong>
+              <p>{selectedSessionDetail.dayOfWeek}</p>
+            </div>
+
+            <div className="event-detail-item">
+              <strong>Time Window:</strong>
+              <p>{selectedSessionDetail.startTime} to {selectedSessionDetail.endTime}</p>
+            </div>
+
+            <div className="event-detail-item">
+              <strong>Location:</strong>
+              <p>SLIIT Tennis Courts</p>
+            </div>
+
+            <button className="btn-close" style={{ width: '100%' }} onClick={() => setSelectedSessionDetail(null)}>
+              Close Details
+            </button>
+          </div>
         </div>
       )}
     </div>

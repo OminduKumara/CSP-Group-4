@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
+import InnerNavbar from '../components/InnerNavbar';
 import '../styles/PlayerProfile.css';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -157,14 +158,11 @@ export default function PlayerProfile() {
 
   return (
     <div className="profile-page-container">
-      <nav className="navbar">
-        <div className="nav-content">
-          <h1>Personal Profile</h1>
-          <div className="nav-right">
-            <button className="back-btn" onClick={() => navigate('/dashboard')}>Dashboard</button>
-          </div>
-        </div>
-      </nav>
+      <InnerNavbar
+        title="Personal Profile"
+        username={auth.user?.username}
+        onLogout={() => { auth.logout(); navigate('/'); }}
+      />
 
       <div className="profile-card">
         {loading ? <p className="loading-text">Loading profile details...</p> : (

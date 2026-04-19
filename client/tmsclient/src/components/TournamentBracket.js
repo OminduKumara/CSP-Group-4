@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Trophy, Users, Calendar, ArrowRight, Trash2, Plus, Monitor, ShieldCheck, FileText, Play, Shield } from 'lucide-react';
 import '../styles/TournamentBracket.css';
 import { tournamentService } from '../services/tournamentService';
 import bracketService from '../services/bracketService';
@@ -96,7 +97,6 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
 
   const handleAddTeam = async () => {
     if (!newTeamName.trim() || !selectedTournamentId || !token) {
-      console.error('Invalid team name, tournament, or token');
       return;
     }
 
@@ -162,7 +162,6 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
   const handleMatchClick = async (matchInfo, isTiebreaker = false) => {
     if (!selectedTournamentId) return;
 
-    // If no token, just open for viewing (read-only) — still stay in dashboard
     if (!token) {
       sessionStorage.setItem('ls_tournament', String(selectedTournamentId));
       if (matchInfo.dbId) sessionStorage.setItem('ls_match', String(matchInfo.dbId));
@@ -188,7 +187,6 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
         dbMatchId = createdMatch.id;
       }
 
-      // Write selections to sessionStorage then switch tab — no page navigation
       sessionStorage.setItem('ls_tournament', String(selectedTournamentId));
       sessionStorage.setItem('ls_match', String(dbMatchId));
       if (onOpenLiveScoring) onOpenLiveScoring();
@@ -224,61 +222,11 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
     return matchups;
   };
 
-  const handleMatchWinner = async (matchKey, winnerId) => {
-    if (!selectedTournamentId || !token) return;
-
-    try {
-      setSavingMatch(matchKey);
-      setError(null);
-
-      const matchups = generateMatchups();
-      const matchup = matchups.find(m => m.key === matchKey);
-
-      if (!matchup) return;
-
-      // If match doesn't exist in DB yet, create it
-      let dbMatchId = matchup.dbId;
-      if (!dbMatchId) {
-        const createdMatch = await bracketService.createMatch(
-          selectedTournamentId,
-          {
-            Team1Id: matchup.team1.id,
-            Team2Id: matchup.team2.id,
-            IsPlayoff: false,
-          },
-          token
-        );
-        dbMatchId = createdMatch.id;
-      }
-
-      // Update/toggle winner
-      const newWinnerId = matchup.winner === winnerId ? null : winnerId;
-      const updated = await bracketService.updateMatch(
-        selectedTournamentId,
-        dbMatchId,
-        { WinnerId: newWinnerId },
-        token
-      );
-
-      // Reload matches from DB
-      const updatedMatches = await bracketService.getMatches(selectedTournamentId);
-      setDbMatches(updatedMatches || []);
-    } catch (err) {
-      console.error('Failed to update match:', err);
-      setError(err.message);
-    } finally {
-      setSavingMatch(null);
-    }
-  };
-
-  // ==================== STANDINGS & TIEBREAKER LOGIC ====================
-
   const calculateStandings = () => {
     const standings = teams.map(team => ({
       ...team,
       wins: 0,
       losses: 0,
-      draws: 0,
     }));
 
     const regularMatches = dbMatches.filter(m => !m.isPlayoff);
@@ -304,7 +252,6 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
     const standings = calculateStandings();
     const tiebreakMatches = [];
 
-    // Group teams by wins
     const winGroups = {};
     standings.forEach(team => {
       if (!winGroups[team.wins]) {
@@ -313,7 +260,6 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
       winGroups[team.wins].push(team);
     });
 
-    // For groups with 2+ teams tied, get/create tiebreaker matches
     Object.values(winGroups).forEach(group => {
       if (group.length >= 2) {
         for (let i = 0; i < group.length; i++) {
@@ -340,58 +286,10 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
     return tiebreakMatches;
   };
 
-  const handleTiebreakerWinner = async (tiebreakKey, winnerId) => {
-    if (!selectedTournamentId || !token) return;
-
-    try {
-      setSavingMatch(tiebreakKey);
-      setError(null);
-
-      const tiebreakers = generateTiebreakers();
-      const tb = tiebreakers.find(t => t.key === tiebreakKey);
-
-      if (!tb) return;
-
-      // If tiebreaker doesn't exist in DB yet, create it
-      let dbMatchId = tb.dbId;
-      if (!dbMatchId) {
-        const createdMatch = await bracketService.createMatch(
-          selectedTournamentId,
-          {
-            Team1Id: tb.team1.id,
-            Team2Id: tb.team2.id,
-            IsPlayoff: true,
-          },
-          token
-        );
-        dbMatchId = createdMatch.id;
-      }
-
-      // Update/toggle winner
-      const newWinnerId = tb.winner === winnerId ? null : winnerId;
-      await bracketService.updateMatch(
-        selectedTournamentId,
-        dbMatchId,
-        { WinnerId: newWinnerId },
-        token
-      );
-
-      // Reload matches from DB
-      const updatedMatches = await bracketService.getMatches(selectedTournamentId);
-      setDbMatches(updatedMatches || []);
-    } catch (err) {
-      console.error('Failed to update tiebreaker:', err);
-      setError(err.message);
-    } finally {
-      setSavingMatch(null);
-    }
-  };
-
   const calculateFinalStandings = () => {
     const standings = calculateStandings();
     const tiebreakers = generateTiebreakers();
 
-    // Apply tiebreaker results
     tiebreakers.forEach(tb => {
       const team1Index = standings.findIndex(t => t.id === tb.team1.id);
       const team2Index = standings.findIndex(t => t.id === tb.team2.id);
@@ -410,8 +308,6 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
     return standings.sort((a, b) => b.wins - a.wins);
   };
 
-  // ==================== HANDLE CLEAR BRACKET ====================
-
   const handleClearBracket = async () => {
     if (!selectedTournamentId || !token || !window.confirm('Are you sure you want to delete the entire bracket?')) {
       return;
@@ -420,9 +316,7 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
     try {
       setLoading(true);
       setError(null);
-
       await bracketService.deleteBracket(selectedTournamentId, token);
-
       setTeams([]);
       setDbMatches([]);
     } catch (err) {
@@ -434,7 +328,6 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
   };
 
   // ==================== COMPUTE DERIVED STATE ====================
-
   const matchups = generateMatchups();
   const tiebreakers_list = generateTiebreakers();
   const finalStandings = calculateFinalStandings();
@@ -444,21 +337,19 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
   const totalTiebreakers = tiebreakers_list.length;
   const completedTiebreakers = tiebreakers_list.filter(t => t.winner).length;
 
-  // ==================== RENDER ====================
-
   return (
     <div className="tournament-bracket-container">
-      <h2>Round Robin Tournament</h2>
+      <h2>Tournament Arena</h2>
 
       {error && <div className="error-message">{error}</div>}
 
       {/* TOURNAMENT SELECTOR */}
       {!selectedTournamentId && (
         loadingTournaments ? (
-          <div className="loading">Loading tournaments...</div>
+          <div className="loading">Initializing Tournament Data...</div>
         ) : (
           <div className="tournament-picker">
-            <p className="picker-label">Select a tournament to view its bracket:</p>
+            <p className="picker-label">Choose an active tournament to manage or view:</p>
             <div className="tournament-cards">
               {tournaments.map(t => (
                 <button
@@ -467,7 +358,7 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
                   onClick={() => setSelectedTournamentId(parseInt(t.id))}
                 >
                   <span className="tc-name">{t.name}</span>
-                  <span className="tc-arrow">Select &rarr;</span>
+                  <div className="tc-arrow"><ArrowRight size={18} /></div>
                 </button>
               ))}
             </div>
@@ -477,31 +368,32 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
 
       {selectedTournamentId && (
         <div className="bracket-active-header">
-          <span className="bracket-tournament-name">
+          <div className="bracket-tournament-name">
+            <Trophy size={20} color="#FF5C00" />
             {tournaments.find(t => t.id === selectedTournamentId)?.name || 'Tournament'}
-          </span>
+          </div>
           <button
             className="btn-change-tournament"
             onClick={() => setSelectedTournamentId(null)}
-          >Change</button>
+          >Switch Tournament</button>
         </div>
       )}
 
       {selectedTournamentId && (
         <div className="bracket-wrapper">
-          {loading && <div className="loading">Loading bracket data...</div>}
+          {loading && <div className="loading">Synchronizing bracket...</div>}
 
           {/* TEAMS MANAGEMENT SECTION */}
           <div className="teams-management-section">
             <div className="left-panel">
-              <h3>Add/Manage Teams</h3>
+              <h3><Users size={18} /> Squad Management</h3>
               <div className="add-team-form">
                 <input
                   type="text"
                   value={newTeamName}
                   onChange={(e) => setNewTeamName(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddTeam()}
-                  placeholder="Enter team name..."
+                  placeholder="Enter Athlete or Team Name"
                   className="team-input-add"
                   disabled={savingTeam || !token}
                 />
@@ -510,52 +402,49 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
                   className="btn-add-team"
                   disabled={savingTeam || !token}
                 >
-                  {savingTeam ? 'Adding...' : '+ Add Team'}
+                  {savingTeam ? 'Adding...' : <Plus size={18} />}
                 </button>
               </div>
 
               <div className="teams-list-container">
-                <h4>Teams ({teams.length})</h4>
+                <h4>Registered Athletes ({teams.length})</h4>
                 <div className="teams-list">
-                  {teams.map((team) => (
-                    <div
-                      key={team.id}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, team.id)}
-                      className={`team-item-managed ${deletingTeam === team.id ? 'deleting' : ''}`}
-                      title={token ? 'Drag to remove' : 'Login to remove'}
-                    >
-                      <span>{team.teamName}</span>
-                      <span className="drag-hint">{token ? 'Remove' : 'Locked'}</span>
-                    </div>
-                  ))}
+                  {teams.length === 0 ? (
+                    <p style={{ opacity: 0.5, fontSize: '0.9rem' }}>No athletes registered yet.</p>
+                  ) : (
+                    teams.map((team) => (
+                      <div
+                        key={team.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, team.id)}
+                        className={`team-item-managed ${deletingTeam === team.id ? 'deleting' : ''}`}
+                      >
+                        <span>{team.teamName}</span>
+                        <div className="drag-hint">
+                           {token ? <Trash2 size={14} color="#f56565" /> : <ShieldCheck size={14} color="#94a3b8" />}
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
 
-                {token && (
+                {token && teams.length > 0 && (
                   <div
                     className="remove-zone"
                     onDragOver={handleDragOver}
                     onDrop={handleDropRemoveZone}
                   >
-                    <p>Drag team here to remove</p>
+                    Drag Athlete here to Remove
                   </div>
                 )}
               </div>
             </div>
 
             <div className="right-panel">
-              <h3>Tournament Info</h3>
+              <h3><Monitor size={18} /> Broadcaster Summary</h3>
               <div className="tournament-info">
                 <div className="info-box">
-                  <span className="info-label">Total Teams:</span>
-                  <span className="info-value">{teams.length}</span>
-                </div>
-                <div className="info-box">
-                  <span className="info-label">Round Robin Matches:</span>
-                  <span className="info-value">{totalMatches}</span>
-                </div>
-                <div className="info-box">
-                  <span className="info-label">Completed:</span>
+                  <span className="info-label">Matches</span>
                   <span className="info-value">{completedMatches}/{totalMatches}</span>
                 </div>
                 <div className="progress-bar">
@@ -569,15 +458,16 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
 
                 {totalTiebreakers > 0 && (
                   <>
-                    <div className="info-box tiebreaker-info">
-                      <span className="info-label">Tiebreaker Matches:</span>
+                    <div className="info-box">
+                      <span className="info-label">Tiebreakers</span>
                       <span className="info-value">{completedTiebreakers}/{totalTiebreakers}</span>
                     </div>
                     <div className="progress-bar">
                       <div
-                        className="progress-fill tiebreaker-fill"
+                        className="progress-fill"
                         style={{
                           width: totalTiebreakers > 0 ? `${(completedTiebreakers / totalTiebreakers) * 100}%` : '0%',
+                          background: '#ca8a04'
                         }}
                       ></div>
                     </div>
@@ -586,20 +476,18 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
               </div>
 
               {finalStandings.length > 0 && (
-                <div className="current-leader">
-                  <h4>Current Leader</h4>
-                  <div className="leader-card">
-                    <div className="leader-name">{finalStandings[0].teamName}</div>
-                    <div className="leader-stats">
-                      <span className="stat-wins">{finalStandings[0].wins} Wins</span>
-                    </div>
+                <div className="leader-card">
+                  <h4 style={{ color: '#FF5C00', fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '8px' }}>Current Leader</h4>
+                  <div className="leader-name">{finalStandings[0].teamName}</div>
+                  <div className="leader-stats">
+                    <span className="stat-wins">{finalStandings[0].wins} Wins</span>
                   </div>
                 </div>
               )}
 
               {token && teams.length > 0 && (
-                <button onClick={handleClearBracket} className="btn-clear-bracket">
-                  Clear Bracket
+                <button onClick={handleClearBracket} className="btn-clear-bracket" style={{ marginTop: '20px' }}>
+                  Clear Tournament Data
                 </button>
               )}
             </div>
@@ -607,10 +495,10 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
 
           {/* MATCHUPS SECTION */}
           <div className="matchups-section">
-            <h3>Schedule & Results</h3>
+            <h3><Calendar size={18} /> Schedule & Results</h3>
             <div className="matchups-container">
               {matchups.length === 0 ? (
-                <p className="no-matchups">Add at least 2 teams to generate matchups</p>
+                <p className="no-matchups">Add at least 2 athletes to generate the tournament schedule</p>
               ) : (
                 <div className="matchups-grid">
                   {matchups.map((match) => (
@@ -620,25 +508,19 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
                       onClick={() => handleMatchClick(match, false)} 
                       style={{ cursor: 'pointer' }}
                     >
-                      <div className="match-team team1">
-                        <div
-                          className={`team-btn ${match.winner === match.team1.id ? 'winner' : ''}`}
-                        >
-                          {match.winner === match.team1.id && '✓ '}
-                          {match.team1.teamName}
-                        </div>
+                      <div className={`match-team team1 ${match.winner === match.team1.id ? 'winner-bg' : ''}`}>
+                        <span>{match.team1.teamName}</span>
+                        {match.winner === match.team1.id && <Trophy size={14} color="#FF5C00" />}
                       </div>
                       <div className="match-vs">
-                        <div style={{marginBottom: "5px"}}>vs</div>
-                        <div style={{fontSize: '0.75rem', color: '#3498db', textDecoration: 'underline'}}>Score Match</div>
+                        <span>VS</span>
                       </div>
-                      <div className="match-team team2">
-                        <div
-                          className={`team-btn ${match.winner === match.team2.id ? 'winner' : ''}`}
-                        >
-                          {match.winner === match.team2.id && '✓ '}
-                          {match.team2.teamName}
-                        </div>
+                      <div className={`match-team team2 ${match.winner === match.team2.id ? 'winner-bg' : ''}`}>
+                        <span>{match.team2.teamName}</span>
+                        {match.winner === match.team2.id && <Trophy size={14} color="#FF5C00" />}
+                      </div>
+                      <div className="score-match-btn">
+                        <Monitor size={12} /> Score Match
                       </div>
                     </div>
                   ))}
@@ -647,42 +529,32 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
             </div>
           </div>
 
-          {/* TIEBREAKER SECTION */}
+          {/* PLAYOFF / TIEBREAKER SECTION */}
           {tiebreakers_list.length > 0 && (
-            <div className="tiebreaker-section">
-              <h3>Playoff Matches</h3>
-              <div className="tiebreaker-info-box">
-                <p>These teams are tied with the same number of wins. Play these tiebreaker matches to determine the final ranking.</p>
+            <div className="matchups-section playoff-section">
+              <div className="section-header-row">
+                <h3><ShieldCheck size={18} color="#ca8a04" /> Playoff Matchups (Tiebreakers)</h3>
+                <span className="playoff-badge">DECISIVE MATCHES</span>
               </div>
               <div className="matchups-container">
                 <div className="matchups-grid">
-                  {tiebreakers_list.map((tb) => (
+                  {tiebreakers_list.map((match) => (
                     <div 
-                      key={tb.key} 
-                      className="match-card tiebreaker-card" 
-                      onClick={() => handleMatchClick(tb, true)} 
-                      style={{ cursor: 'pointer' }}
+                      key={match.key} 
+                      className="match-card playoff-card" 
+                      onClick={() => handleMatchClick(match, true)} 
                     >
-                      <div className="tiebreaker-badge">PLAYOFF</div>
-                      <div className="match-team team1">
-                        <div
-                          className={`team-btn ${tb.winner === tb.team1.id ? 'winner' : ''}`}
-                        >
-                          {tb.winner === tb.team1.id && '✓ '}
-                          {tb.team1.teamName}
-                        </div>
+                      <div className={`match-team team1 ${match.winner === match.team1.id ? 'winner-bg' : ''}`}>
+                        <span>{match.team1.teamName}</span>
+                        {match.winner === match.team1.id && <Trophy size={14} color="#FF5C00" />}
                       </div>
-                      <div className="match-vs">
-                        <div style={{marginBottom: "5px"}}>vs</div>
-                        <div style={{fontSize: '0.75rem', color: '#3498db', textDecoration: 'underline'}}>Score Match</div>
+                      <div className="match-vs"><span>VS</span></div>
+                      <div className={`match-team team2 ${match.winner === match.team2.id ? 'winner-bg' : ''}`}>
+                        <span>{match.team2.teamName}</span>
+                        {match.winner === match.team2.id && <Trophy size={14} color="#FF5C00" />}
                       </div>
-                      <div className="match-team team2">
-                        <div
-                          className={`team-btn ${tb.winner === tb.team2.id ? 'winner' : ''}`}
-                        >
-                          {tb.winner === tb.team2.id && '✓ '}
-                          {tb.team2.teamName}
-                        </div>
+                      <div className="score-match-btn playoff-btn">
+                        <Play size={12} /> Score Playoff
                       </div>
                     </div>
                   ))}
@@ -693,24 +565,21 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
 
           {/* STANDINGS SECTION */}
           <div className="standings-section">
-            <h3>Final Standings {totalTiebreakers > 0 && '(After Playoffs)'}</h3>
+            <h3>Standings Registry</h3>
             {finalStandings.length === 0 ? (
-              <p className="no-standings">Add teams to see standings</p>
+              <p style={{ opacity: 0.5 }}>Register athletes to view real-time standings.</p>
             ) : (
-              <div className="standings-table">
+              <div className="standings-table-container">
                 <div className="standings-header">
-                  <div className="pos">Position</div>
-                  <div className="team">Team</div>
-                  <div className="wins">Wins</div>
-                  <div className="losses">Losses</div>
+                  <div className="pos">Rank</div>
+                  <div className="team">Athlete</div>
+                  <div className="wins">W</div>
+                  <div className="losses">L</div>
                 </div>
                 {finalStandings.map((team, index) => (
                   <div key={team.id} className={`standings-row ${index === 0 ? 'champion' : ''}`}>
                     <div className="pos">
-                      {index === 0 && '1st'}
-                      {index === 1 && '2nd'}
-                      {index === 2 && '3rd'}
-                      {index > 2 && `#${index + 1}`}
+                      {index === 0 ? <Trophy size={16} color="#FF5C00" /> : `#${index + 1}`}
                     </div>
                     <div className="team">{team.teamName}</div>
                     <div className="wins">{team.wins}</div>
@@ -721,29 +590,36 @@ const TournamentBracket = ({ onOpenLiveScoring }) => {
             )}
 
             {finalStandings.length > 0 && finalStandings[0].wins > 0 && (
-              <div className="winner-announcement">
-                <h2>CHAMPION</h2>
-                <p className="champion-name">{finalStandings[0].teamName}</p>
-                <p className="champion-record">{finalStandings[0].wins} Wins</p>
+              <div className="winner-announcement-pro">
+                <div className="trophy-broadcast-wrapper">
+                  <div className="trophy-glow"></div>
+                  <Trophy size={80} color="#FFD700" strokeWidth={2.5} />
+                </div>
+                <div className="champion-badge">OFFICIAL TOURNAMENT CHAMPION</div>
+                <h2 className="champion-name-display">{finalStandings[0].teamName}</h2>
+                <div className="champion-meta">
+                  <div className="meta-item">
+                    <span className="meta-label">RECORD</span>
+                    <span className="meta-value">{finalStandings[0].wins}W - {finalStandings[0].losses}L</span>
+                  </div>
+                  <div className="meta-divider"></div>
+                  <div className="meta-item">
+                    <span className="meta-label">STATUS</span>
+                    <span className="meta-value">UNDISPUTED</span>
+                  </div>
+                </div>
               </div>
             )}
 
             {/* SUMMARY REPORT BUTTON */}
             {finalStandings.length > 0 && (
-              <div style={{ textAlign: 'center', marginTop: '24px' }}>
+              <div style={{ textAlign: 'center', marginTop: '32px' }}>
                 <button
-                  className="btn-summary-report"
+                  className="btn-add-team"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
                   onClick={() => setShowSummaryReport(true)}
-                  title="View and download tournament summary report"
                 >
-                  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                    <line x1="16" y1="13" x2="8" y2="13"/>
-                    <line x1="16" y1="17" x2="8" y2="17"/>
-                    <polyline points="10 9 9 9 8 9"/>
-                  </svg>
-                  Generate Summary Report
+                  <FileText size={18} /> Download Tournament Summary
                 </button>
               </div>
             )}

@@ -1,135 +1,631 @@
-/* Core Page Layout */
+/* ================================================================
+   SLIIT Tennis – Landing Page (Redesign)
+   Palette: Navy #000080 · Orange #FF5C00 · White #FFFFFF
+   ================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ---------- tokens ---------- */
+:root {
+  --lp-navy:    #000080;
+  --lp-navy-d:  #000060;
+  --lp-orange:  #FF5C00;
+  --lp-orange-l:#ff7a2e;
+  --lp-white:   #FFFFFF;
+  --lp-off:     #F5F7FA;
+  --lp-gray:    #6B7280;
+  --lp-gray-lt: #E5E7EB;
+  --lp-text:    #1E293B;
+  --lp-radius:  14px;
+  --lp-shadow:  0 4px 24px rgba(0,0,128,0.06);
+  --lp-shadow-hover: 0 12px 40px rgba(0,0,128,0.12);
+  --lp-transition: .35s cubic-bezier(.4,0,.2,1);
+}
+
+/* ---------- base ---------- */
 .landing-container {
-  font-family: Arial, sans-serif;
-  background-color: #FFFFFF;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--lp-white);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  color: var(--lp-text);
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.lp-hero {
   position: relative;
+  min-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: url('../assets/tennis-hero-bg.png') center/cover no-repeat;
+  padding: 6rem 2rem 8rem;
+}
+
+.lp-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(0,0,50,.96) 0%,
+    rgba(0,0,80,.92) 40%,
+    rgba(255,92,0,.40) 100%
+  );
   z-index: 1;
 }
 
-/* Watermark Overlay */
-.landing-container::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url('../assets/tennis-logo.png');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: 80%; /* Adjusted for better visibility */
-  opacity: 0.05;
-  z-index: -1;
+.lp-hero__content {
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
 }
 
-/* Hero Banner */
-.hero {
-  text-align: center;
-  padding: 4rem 2rem;
-  background-color: #f4f6f9;
+/* Animated title */
+.lp-hero__animated-text {
+  display: inline-block;
+  background: linear-gradient(
+    90deg,
+    var(--lp-white) 0%,
+    var(--lp-orange) 45%,
+    var(--lp-white) 55%,
+    var(--lp-white) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation:
+    fadeSlideUp .9s ease both,
+    heroShimmer 3s ease 1.2s infinite;
 }
 
-.hero-title {
-  font-size: 2.5rem;
-  color: #000080;
+.lp-hero__title {
+  font-size: clamp(3rem, 7vw, 5rem);
+  font-weight: 900;
+  line-height: 1.05;
+  color: var(--lp-white);
+  margin-bottom: 0.6rem;
+  letter-spacing: -1px;
+}
+
+.lp-hero__tagline {
+  font-size: clamp(1.3rem, 3vw, 2rem);
+  font-weight: 600;
+  color: rgba(255,255,255,.85);
   margin-bottom: 1rem;
+  animation: fadeSlideUp .8s ease .2s both;
 }
 
-.hero-subtitle {
-  font-size: 1.2rem;
-  color: #4a5568;
+.lp-hero__accent {
+  color: var(--lp-orange);
+  position: relative;
+}
+.lp-hero__accent::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: 2px;
+  width: 100%; height: 4px;
+  background: var(--lp-orange);
+  border-radius: 2px;
+  opacity: .45;
 }
 
-/* Sections Structure */
-.main-content {
-  padding: 2rem;
-  max-width: 1000px;
+.lp-hero__subtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-weight: 400;
+  color: rgba(255,255,255,.8);
+  line-height: 1.65;
+  margin-bottom: 2.2rem;
+  animation: fadeSlideUp .8s ease .3s both;
+}
+
+.lp-hero__cta {
+  display: inline-block;
+  padding: .9rem 2.4rem;
+  background: var(--lp-orange);
+  color: var(--lp-white);
+  font-family: inherit;
+  font-size: .95rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 50px;
+  text-decoration: none;
+  cursor: pointer;
+  letter-spacing: .4px;
+  box-shadow: 0 4px 20px rgba(255,92,0,.35);
+  transition: transform var(--lp-transition), box-shadow var(--lp-transition);
+  animation: fadeSlideUp .8s ease .45s both;
+}
+.lp-hero__cta:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(255,92,0,.50);
+}
+
+/* floating stats bar */
+.lp-stats-bar {
+  position: absolute;
+  bottom: -38px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background: var(--lp-white);
+  padding: 1.5rem 3.5rem;
+  border-radius: var(--lp-radius);
+  box-shadow: var(--lp-shadow-hover);
+  animation: fadeSlideUp .8s ease .6s both;
+}
+
+.lp-stat {
+  display: flex; flex-direction: column; align-items: center; gap: .25rem;
+}
+.lp-stat__number {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--lp-navy);
+}
+.lp-stat__label {
+  font-size: .78rem;
+  font-weight: 500;
+  color: var(--lp-gray);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+}
+.lp-stat-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--lp-gray-lt);
+}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+.lp-main {
+  padding-top: 4rem;
+}
+
+.lp-section {
+  padding: 5rem 2rem;
+  max-width: 1140px;
   margin: 0 auto;
 }
 
-.section-container {
-  margin-top: 2rem;
-  margin-bottom: 4rem;
+.lp-section--alt {
+  background: var(--lp-off);
+  max-width: 100%;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+.lp-section--alt > .lp-section__header,
+.lp-section--alt > .lp-leadership-grid,
+.lp-section--alt > .lp-timeline {
+  max-width: 1140px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.section-title {
+.lp-section__header {
   text-align: center;
-  color: #000080;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
 }
 
-/* Practice Times Grid */
-.grid {
+.lp-section__tag {
+  display: inline-block;
+  padding: .3rem 1rem;
+  background: rgba(0,0,128,.07);
+  color: var(--lp-navy);
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border-radius: 50px;
+  margin-bottom: .8rem;
+}
+
+.lp-section__title {
+  font-size: clamp(1.6rem, 3.5vw, 2.3rem);
+  font-weight: 800;
+  color: var(--lp-navy);
+  margin-bottom: .6rem;
+}
+
+.lp-section__desc {
+  font-size: 1.05rem;
+  color: var(--lp-gray);
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.65;
+}
+
+
+/* ============================================================
+   PRACTICE CARDS
+   ============================================================ */
+.lp-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.8rem;
+}
+
+/* Ensure Reveal wrappers fill grid cells */
+.lp-cards-grid > .reveal-on-scroll,
+.lp-leadership-grid > .reveal-on-scroll,
+.lp-contact-grid > .reveal-on-scroll {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+}
+.lp-cards-grid > .reveal-on-scroll > *,
+.lp-leadership-grid > .reveal-on-scroll > *,
+.lp-contact-grid > .reveal-on-scroll > * {
+  flex: 1;
+}
+
+.lp-practice-card {
+  background: var(--lp-white);
+  border-radius: var(--lp-radius);
+  padding: 2.2rem 1.8rem;
+  text-align: center;
+  box-shadow: var(--lp-shadow);
+  border: 1px solid var(--lp-gray-lt);
+  transition: transform var(--lp-transition), box-shadow var(--lp-transition), border-color var(--lp-transition);
+  position: relative;
+  overflow: hidden;
+}
+.lp-practice-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 4px;
+  background: linear-gradient(90deg, var(--lp-navy), var(--lp-orange));
+  opacity: 0;
+  transition: opacity var(--lp-transition);
+}
+.lp-practice-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--lp-shadow-hover);
+  border-color: transparent;
+}
+.lp-practice-card:hover::before {
+  opacity: 1;
+}
+
+.lp-practice-card__icon {
+  font-size: 2.2rem;
+  margin-bottom: .8rem;
+}
+
+.lp-practice-card__day {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--lp-navy);
+  margin-bottom: .6rem;
+}
+
+.lp-practice-card__time {
+  display: flex;
+  align-items: center;
   justify-content: center;
+  gap: .45rem;
+  font-size: .92rem;
+  color: var(--lp-gray);
+  margin-bottom: .8rem;
+}
+.lp-practice-card__time svg {
+  color: var(--lp-orange);
+  flex-shrink: 0;
+}
+
+.lp-practice-card__type {
+  display: inline-block;
+  padding: .35rem 1rem;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--lp-orange);
+  background: rgba(255,92,0,.08);
+  border-radius: 50px;
+}
+
+
+/* ============================================================
+   LEADERSHIP CARDS
+   ============================================================ */
+.lp-leadership-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 2rem;
 }
 
-.practice-card, .leadership-card {
-  flex: 1;
-  min-width: 250px;
-  max-width: 300px;
-  background-color: #FFFFFF;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-  border-top: 4px solid #FF5C00;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.lp-leader-card {
+  background: var(--lp-white);
+  border-radius: var(--lp-radius);
+  padding: 2.4rem 2rem;
+  box-shadow: var(--lp-shadow);
+  border: 1px solid var(--lp-gray-lt);
+  transition: transform var(--lp-transition), box-shadow var(--lp-transition);
+  position: relative;
+  overflow: hidden;
 }
-
-.practice-card:hover, .leadership-card:hover {
+.lp-leader-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 100%; height: 3px;
+  background: linear-gradient(90deg, var(--lp-orange), var(--lp-navy));
+}
+.lp-leader-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+  box-shadow: var(--lp-shadow-hover);
 }
 
-.card-title {
-  color: #000080;
-  margin-top: 0;
+.lp-leader-card__badge {
+  width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: rgba(0,0,128,.06);
+  color: var(--lp-navy);
+  font-size: 1.4rem;
+  font-weight: 700;
   margin-bottom: 1rem;
 }
 
-/* Contact and Team Styling */
-.leadership-row {
+.lp-leader-card__team {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--lp-navy);
+  margin-bottom: 1.2rem;
+}
+
+.lp-leader-card__row {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 4rem;
-  text-align: center;
+  align-items: center;
+  gap: .8rem;
+  padding: .65rem 0;
+  border-bottom: 1px solid var(--lp-gray-lt);
+}
+.lp-leader-card__row:last-child {
+  border-bottom: none;
 }
 
-.team-heading {
-  color: #000080;
-  margin-bottom: 0.5rem;
-  border-bottom: 2px solid #FF5C00;
+.lp-leader-card__role {
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--lp-orange);
+  min-width: 110px;
+}
+
+.lp-leader-card__name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--lp-text);
+}
+
+
+/* ============================================================
+   CONTACT CARDS
+   ============================================================ */
+.lp-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.lp-contact-card {
+  background: var(--lp-white);
+  border-radius: var(--lp-radius);
+  padding: 2rem 2rem;
+  box-shadow: var(--lp-shadow);
+  border: 1px solid var(--lp-gray-lt);
+  transition: transform var(--lp-transition), box-shadow var(--lp-transition);
+}
+.lp-contact-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--lp-shadow-hover);
+}
+
+.lp-contact-card__label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--lp-navy);
+  margin-bottom: 1rem;
+  padding-bottom: .6rem;
+  border-bottom: 2px solid var(--lp-orange);
   display: inline-block;
-  padding-bottom: 4px;
 }
 
-.contact-section {
-  background-color: #f4f6f9;
-  padding: 2rem;
-  border-radius: 8px;
-  text-align: center;
+.lp-contact-card__item {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .5rem 0;
+  font-size: .95rem;
+  color: var(--lp-text);
 }
 
-.contact-details p {
-  margin: 0.5rem 0;
-  font-size: 1.1rem;
+.lp-contact-card__icon {
+  font-size: 1.15rem;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,128,.05);
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
-/* Legacy Section */
-.legacy-list {
-  max-width: 600px;
+
+/* ============================================================
+   TIMELINE  (Past Captains)
+   ============================================================ */
+.lp-timeline {
+  position: relative;
+  max-width: 680px;
   margin: 0 auto;
-  text-align: center;
-  line-height: 1.8;
-  color: #4a5568;
+  padding-left: 2.5rem;
+}
+.lp-timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--lp-orange), var(--lp-navy));
+  border-radius: 2px;
 }
 
-.legacy-list strong {
-  color: #000080;
+.lp-timeline__item {
+  position: relative;
+  padding: 1.5rem 0 1.5rem 1.2rem;
+}
+.lp-timeline__item::before {
+  content: '';
+  position: absolute;
+  left: -2.12rem; top: 1.75rem;
+  width: 14px; height: 14px;
+  background: var(--lp-orange);
+  border: 3px solid var(--lp-white);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(255,92,0,.2);
+}
+
+.lp-timeline__year {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--lp-navy);
+  margin-bottom: .6rem;
+}
+
+.lp-timeline__content {
+  background: var(--lp-white);
+  border-radius: var(--lp-radius);
+  padding: 1.2rem 1.5rem;
+  box-shadow: var(--lp-shadow);
+  border: 1px solid var(--lp-gray-lt);
+}
+
+.lp-timeline__row {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  padding: .45rem 0;
+}
+.lp-timeline__row + .lp-timeline__row {
+  border-top: 1px solid var(--lp-gray-lt);
+}
+
+.lp-timeline__team {
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--lp-orange);
+  min-width: 72px;
+}
+
+.lp-timeline__name {
+  font-size: .95rem;
+  font-weight: 500;
+  color: var(--lp-text);
+}
+
+
+/* ============================================================
+   LOADER
+   ============================================================ */
+.lp-loader {
+  text-align: center;
+  padding: 3rem 0;
+  color: var(--lp-gray);
+}
+.lp-loader__spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--lp-gray-lt);
+  border-top-color: var(--lp-orange);
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: spin .7s linear infinite;
+}
+
+
+/* ============================================================
+   SCROLL-REVEAL
+   ============================================================ */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity .7s cubic-bezier(.4,0,.2,1),
+    transform .7s cubic-bezier(.4,0,.2,1);
+}
+.reveal-on-scroll.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* ============================================================
+   KEYFRAMES
+   ============================================================ */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+  .lp-hero {
+    min-height: 80vh;
+    padding: 5rem 1.5rem 7rem;
+  }
+
+  .lp-stats-bar {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.2rem 2rem;
+    bottom: -60px;
+  }
+  .lp-stat-divider {
+    width: 60px; height: 1px;
+  }
+
+  .lp-main { padding-top: 5rem; }
+
+  .lp-section {
+    padding: 3.5rem 1.25rem;
+  }
+
+  .lp-leadership-grid,
+  .lp-contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-timeline {
+    padding-left: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .lp-hero__title {
+    font-size: 2rem;
+  }
+
+  .lp-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-stats-bar {
+    width: calc(100% - 2rem);
+    margin: 0 1rem;
+  }
 }

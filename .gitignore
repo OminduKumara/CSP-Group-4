@@ -1,14 +1,36 @@
 # -----------------------------
-# .NET / C# build artifacts
+# Testing & Reports
 # -----------------------------
 bin/
 obj/
 out/
 publish/
 TestResults/
+test-results/
+playwright-report/
+coverage/
+.nyc_output/
+tests/
+client/tmsclient/src/tests/
+client/tmsclient/tests/
+**/*.test.*
+**/*.spec.*
+vitest.config.js
+playwright.config.js
+generate-excel-reports.cjs
+debug.cjs
+
 *.trx
 *.coverage
 *.coveragexml
+*.xlsx
+results.json
+test-results.json
+blob-report/
+playwright/.cache/
+
+
+
 
 # User-specific Visual Studio / Rider files
 *.user

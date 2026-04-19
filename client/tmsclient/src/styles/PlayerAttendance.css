@@ -1,37 +1,44 @@
+/* ================================================================
+   Player Attendance – Unified Theme
+   ================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
 .player-attendance-container {
   min-height: 100vh;
-  background: #f9fafb;
+  background: #F5F7FA;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .attendance-content {
-  max-width: 1280px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 28px 24px;
 }
 
-.back-btn {
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #374151;
-  background: white;
-  border: 1.5px solid #d1d5db;
-  border-radius: 10px;
-  cursor: pointer;
+.attendance-content h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #000040;
+  margin-bottom: 20px;
 }
 
 .status-present {
-  color: #065f46;
-  background: #d1fae5;
-  padding: 4px 8px;
-  border-radius: 12px;
+  display: inline-block;
+  padding: 4px 14px;
+  background: #D1FAE5;
+  color: #065F46;
+  border-radius: 50px;
+  font-size: 12px;
   font-weight: 600;
 }
 
 .status-absent {
-  color: #991b1b;
-  background: #fee2e2;
-  padding: 4px 8px;
-  border-radius: 12px;
+  display: inline-block;
+  padding: 4px 14px;
+  background: #FEE2E2;
+  color: #991B1B;
+  border-radius: 50px;
+  font-size: 12px;
   font-weight: 600;
 }
