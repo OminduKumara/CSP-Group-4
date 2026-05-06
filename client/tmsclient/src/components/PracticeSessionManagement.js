@@ -46,10 +46,38 @@ export default function PracticeSessionManagement({ token }) {
     setEditingId(session.id);
     setFormData({
       dayOfWeek: session.dayOfWeek,
-      startTime: session.startTime,
-      endTime: session.endTime,
+      startTime: formatToTimeInput(session.startTime),
+      endTime: formatToTimeInput(session.endTime),
       sessionType: session.sessionType
     });
+  };
+
+  // Convert common time strings (e.g. "3:00 PM" or "15:00") to HTML time input value "HH:MM"
+  const formatToTimeInput = (raw) => {
+    if (!raw) return '';
+    const s = String(raw).trim();
+
+    // Match h:mm AM/PM or hh:mm am/pm
+    const ampm = s.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (ampm) {
+      let h = parseInt(ampm[1], 10);
+      const m = ampm[2];
+      const period = ampm[3].toUpperCase();
+      if (period === 'PM' && h !== 12) h += 12;
+      if (period === 'AM' && h === 12) h = 0;
+      return String(h).padStart(2, '0') + ':' + m;
+    }
+
+    // Match 24-hour HH:MM or H:MM
+    const hhmm = s.match(/^(\d{1,2}):(\d{2})$/);
+    if (hhmm) {
+      const h = parseInt(hhmm[1], 10);
+      const m = hhmm[2];
+      return String(h).padStart(2, '0') + ':' + m;
+    }
+
+    // Fallback: return empty so input stays blank
+    return '';
   };
 
   const cancelEdit = () => {
@@ -92,15 +120,31 @@ export default function PracticeSessionManagement({ token }) {
 
     try {
       setError('');
-      const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error("Failed to delete");
-      
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errBody = await response.json().catch(() => ({}));
+        const message = errBody.message || `Failed to delete (${response.status})`;
+        throw new Error(message);
+      }
+
       setSuccess("Session deleted!");
       fetchSessions();
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       console.error("Delete error:", err);
-      setError("Cannot delete from database while Azure Firewall is blocking connection.");
+      // If it's an auth error, show clearer message
+      if (err.message && err.message.toLowerCase().includes('unauthor')) {
+        setError('You are not authorized to delete this session. Please login as an admin.');
+      } else {
+        setError("Cannot delete from database while Azure Firewall is blocking connection.");
+      }
     }
   }; 
 
@@ -135,12 +179,12 @@ export default function PracticeSessionManagement({ token }) {
 
           <div className="form-group-item">
             <label>Start Time</label>
-            <input type="text" name="startTime" value={formData.startTime} onChange={handleInputChange} placeholder="e.g. 3:00 PM" required />
+            <input type="time" name="startTime" value={formData.startTime} onChange={handleInputChange} required />
           </div>
 
           <div className="form-group-item">
             <label>End Time</label>
-            <input type="text" name="endTime" value={formData.endTime} onChange={handleInputChange} placeholder="e.g. 6:30 PM" required />
+            <input type="time" name="endTime" value={formData.endTime} onChange={handleInputChange} required />
           </div>
 
           <div className="form-group-item">

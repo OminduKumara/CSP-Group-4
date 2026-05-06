@@ -1,0 +1,37 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Performance Test Report</title>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; display: flex; justify-content: center; padding-top: 50px; }
+            .container { background-color: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 600px; width: 100%; }
+            h1 { color: #2c3e50; text-align: center; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 30px; }
+            .metric { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #eee; font-size: 1.1em; }
+            .metric:last-child { border-bottom: none; }
+            .label { font-weight: bold; color: #7f8c8d; }
+            .value { font-weight: bold; color: #2c3e50; }
+            .success { color: #27ae60; }
+            .error { color: #e74c3c; }
+            .highlight { color: #3498db; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Load Test Results</h1>
+            <div class="metric"><span class="label">Target Endpoint:</span> <span class="value">http://localhost:5011/api/Health</span></div>
+            <div class="metric"><span class="label">Total Requests Simulated:</span> <span class="value">200</span></div>
+            <div class="metric"><span class="label">Concurrent Users:</span> <span class="value">20</span></div>
+            <div class="metric"><span class="label">Total Time Elapsed:</span> <span class="value highlight">128 ms</span></div>
+            <div class="metric"><span class="label">Overall Throughput:</span> <span class="value highlight">1562.50 req/sec</span></div>
+            <div class="metric"><span class="label">Successful Requests:</span> <span class="value success">0</span></div>
+            <div class="metric"><span class="label">Failed/Errored:</span> <span class="value error">200</span></div>
+            <div class="metric"><span class="label">Minimum Response Time:</span> <span class="value">7 ms</span></div>
+            <div class="metric"><span class="label">Average Response Time:</span> <span class="value highlight">10.92 ms</span></div>
+            <div class="metric"><span class="label">Maximum Response Time:</span> <span class="value">31 ms</span></div>
+        </div>
+    </body>
+    </html>
+    

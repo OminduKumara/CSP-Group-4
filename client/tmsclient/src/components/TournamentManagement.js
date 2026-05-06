@@ -92,11 +92,31 @@ export default function TournamentManagement({ token, onTournamentAdded }) {
     setFormData({
       name: tournament.name,
       description: tournament.description,
-      startDate: tournament.startDate.split('T')[0],
-      endDate: tournament.endDate.split('T')[0]
+      startDate: formatToDateTimeLocal(tournament.startDate),
+      endDate: formatToDateTimeLocal(tournament.endDate)
     });
     setEditingId(tournament.id);
     setShowForm(true);
+  }
+
+  // Convert an ISO date string to a value suitable for `input[type="datetime-local"]`
+  // e.g. "2026-05-06T15:30:00Z" -> "2026-05-06T15:30"
+  function formatToDateTimeLocal(iso) {
+    if (!iso) return '';
+    try {
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return '';
+
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const hours = String(d.getHours()).padStart(2, '0');
+      const mins = String(d.getMinutes()).padStart(2, '0');
+
+      return `${year}-${month}-${day}T${hours}:${mins}`;
+    } catch {
+      return '';
+    }
   }
 
   async function handleDelete(id) {

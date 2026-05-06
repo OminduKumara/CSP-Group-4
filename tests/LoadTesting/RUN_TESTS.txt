@@ -1,0 +1,39 @@
+======================================================
+  SLIIT TENNIS MANAGEMENT SYSTEM - QA & DEMO GUIDE
+======================================================
+
+During your Viva Panel presentation, you can run these 
+scripts to demonstrate the robustness of your backend.
+
+PREREQUISITE:
+-------------
+Ensure your ASP.NET Backend is running in a terminal first!
+(Navigate to server/tmsserver and run: dotnet run)
+
+COMMAND 1: Run the Performance Load Test
+------------------------------------------------------
+Open a NEW terminal window in the project root directory 
+and run:
+
+  node tests/LoadTesting/attendance_load_test.js
+
+What it does: 
+Simulates 20 concurrent users hitting your server with 
+200 requests. It prints a progress bar, shows the live 
+results in the terminal, and automatically creates a 
+beautiful HTML report (performance_report.html).
+
+
+COMMAND 2: Generate API Documentation
+------------------------------------------------------
+In that same terminal window, run:
+
+  node tests/LoadTesting/generate_api_docs.js
+
+What it does:
+Connects to your running backend, downloads all the live 
+endpoint data, and generates a standalone, interactive 
+API reference HTML file (api_documentation.html) that 
+you can open in your browser to show the panel.
+
+======================================================

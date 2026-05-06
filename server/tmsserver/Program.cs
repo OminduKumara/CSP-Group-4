@@ -22,12 +22,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
-// Use AZURE_SQL_CONNECTIONSTRING environment variable
-var connectionString = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
+// Use AZURE_SQL_CONNECTIONSTRING environment variable or fallback to appsettings
+var connectionString = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING") 
+    ?? builder.Configuration["AZURE_SQL_CONNECTIONSTRING"]
+    ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
 if (string.IsNullOrEmpty(connectionString))
 {
-    throw new InvalidOperationException("Environment variable 'AZURE_SQL_CONNECTIONSTRING' is not configured.");
+    throw new InvalidOperationException("Database connection string is not configured. Please set AZURE_SQL_CONNECTIONSTRING or DefaultConnection in appsettings.json.");
 }
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
